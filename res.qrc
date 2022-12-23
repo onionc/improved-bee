@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Icon/about.png</file>
+        <file>Icon/AIMCNT.jpg</file>
+        <file>Icon/clear.png</file>
+        <file>Icon/COM.png</file>
+        <file>Icon/cursor.png</file>
+        <file>Icon/curve.png</file>
+        <file>Icon/dashBoard.png</file>
+        <file>Icon/fangda.png</file>
+        <file>Icon/feiji.png</file>
+        <file>Icon/help.png</file>
+        <file>Icon/protocol.png</file>
+        <file>Icon/Screenshot.png</file>
+        <file>Icon/ShowLegend.png</file>
+        <file>Icon/start.png</file>
+        <file>Icon/stop.png</file>
+        <file>main.cpp</file>
+        <file>mainwindow.cpp</file>
+        <file>mainwindow.h</file>
+    </qresource>
+</RCC>
