@@ -25,10 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    comboboxdelegate.cpp \
+    datatype.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    comboboxdelegate.h \
+    datatype.h
 
 FORMS += \
         mainwindow.ui

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "comboboxdelegate.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,8 +20,9 @@ private:
     Ui::MainWindow *ui;
 
     // 表格
+    ComboboxDelegate comboboxDelegate;
     enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
-    void addRow(int curRow, QString name="title", QString type="char", QString data=""); // 添加一行
+    void addRow(int curRow, QString name="title", QString type="char", QString data=""); // 表格新增一行
 
     // 协议
     const char* FRAME_HEADER = "Frame_Header";
