@@ -30,9 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
-
-    ui->tableWidget->insertRow(0); // 插入一行
-    addRow(0, FRAME_HEADER, "char", "0xAA");
+    on_addHeaderBtn_clicked(); // 插入一行帧头
 
 }
 
@@ -51,7 +49,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     // 名称
     item = new QTableWidgetItem(name, typeValue++);
     ui->tableWidget->setItem(curRow, colName, item);
-    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CEHCK){
+    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         // 特殊项名称不可编辑
         item->setFlags(item->flags() & (~Qt::ItemIsEditable));
     }else{
@@ -75,7 +73,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     // 绘图1
     item = new QTableWidgetItem("", typeValue++);
     ui->tableWidget->setItem(curRow, colCurve1, item);
-    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CEHCK){
+    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         // 特殊项不可选择绘图
         item->setFlags(item->flags() & (Qt::NoItemFlags));
     }else{
@@ -87,7 +85,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     // 绘图2
     item = new QTableWidgetItem("", typeValue++);
     ui->tableWidget->setItem(curRow, colCurve2, item);
-    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CEHCK){
+    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         item->setFlags(item->flags() & (Qt::NoItemFlags));
     }else{
         item->setCheckState(Qt::Unchecked);
@@ -97,7 +95,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     // 绘图3
     item = new QTableWidgetItem("", typeValue++);
     ui->tableWidget->setItem(curRow, colCurve3, item);
-    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CEHCK){
+    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         item->setFlags(item->flags() & (Qt::NoItemFlags));
     }else{
         item->setCheckState(Qt::Unchecked);
@@ -126,4 +124,28 @@ void MainWindow::on_delRowBtn_clicked()
     ui->tableWidget->removeRow(ui->tableWidget->currentRow());
 
     ui->tableWidget->selectRow(ui->tableWidget->currentRow());
+}
+
+// 添加帧头
+void MainWindow::on_addHeaderBtn_clicked()
+{
+    int curRow = ui->tableWidget->rowCount();
+    ui->tableWidget->insertRow(curRow);
+
+    addRow(curRow, FRAME_HEADER, "uchar", "0xAA");
+
+    // 选定新行
+    ui->tableWidget->selectRow(curRow);
+}
+
+// 添加校验和
+void MainWindow::on_addCheckSumBtn_clicked()
+{
+    int curRow = ui->tableWidget->rowCount();
+    ui->tableWidget->insertRow(curRow);
+
+    addRow(curRow, FRAME_CHECK, "uchar", "");
+
+    // 选定新行
+    ui->tableWidget->selectRow(curRow);
 }

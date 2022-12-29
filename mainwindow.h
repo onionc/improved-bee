@@ -31,8 +31,8 @@ private:
 
     // 数据协议
     const char* FRAME_HEADER = "Frame_Header";
-    const char* FRAME_END = "Frame_Tail";
-    const char* FRAME_CEHCK = "Check_Sum";
+    const char* FRAME_END = "Frame_Tail"; // 帧尾暂时没用到
+    const char* FRAME_CHECK = "Check_Sum";
 
 
 private slots:
@@ -42,6 +42,8 @@ private slots:
     void on_addRowBtn_clicked();
     // 删除选定行
     void on_delRowBtn_clicked();
+    void on_addHeaderBtn_clicked();
+    void on_addCheckSumBtn_clicked();
 };
 
 #endif // MAINWINDOW_H
