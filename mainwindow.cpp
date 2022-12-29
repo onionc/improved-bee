@@ -23,13 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setColumnWidth(colCurve3, 40); // 列宽
     ui->tableWidget->setAlternatingRowColors(true); // 隔行换色
     ui->tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // 竖直滚动条
-    ui->tableWidget->setStyleSheet("QTableWidget::item:selected{background:lightblue}"); // 选定为淡蓝色
     ui->tableWidget->setItemDelegateForColumn(colType,&comboboxDelegate);   //委托
 
     ui->tableWidget->insertRow(0); // 插入一行
     addRow(0, FRAME_HEADER, "char", "0xAA");
-
-
 
 }
 
@@ -103,3 +100,18 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
 
 }
 
+
+// ----------------------- 数据协议 -----------------------
+// 增加一行
+void MainWindow::on_addRowBtn_clicked()
+{
+    int curRow = ui->tableWidget->rowCount();
+    ui->tableWidget->insertRow(curRow);
+    addRow(curRow);
+}
+
+// 删除选定行
+void MainWindow::on_delRowBtn_clicked()
+{
+    ui->tableWidget->removeRow(ui->tableWidget->currentRow());
+}

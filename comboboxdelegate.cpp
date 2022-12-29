@@ -1,12 +1,9 @@
 #include "comboboxdelegate.h"
 #include "datatype.h"
 
-ComboboxDelegate::ComboboxDelegate(QObject *parent) : QItemDelegate(parent)
-{
+ComboboxDelegate::ComboboxDelegate(QObject *parent) : QItemDelegate(parent){
 
 }
-
-
 
 QWidget *ComboboxDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
 

@@ -16,19 +16,30 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+
+
 private:
     Ui::MainWindow *ui;
 
     // 表格
-    ComboboxDelegate comboboxDelegate;
+    ComboboxDelegate comboboxDelegate; // // 下拉框代理
     enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
-    void addRow(int curRow, QString name="title", QString type="char", QString data=""); // 表格新增一行
+    void addRow(int curRow, QString name="<name>", QString type="char", QString data=""); // 表格新增一行
 
-    // 协议
+    // 数据协议
     const char* FRAME_HEADER = "Frame_Header";
     const char* FRAME_END = "Frame_Tail";
     const char* FRAME_CEHCK = "Check_Sum";
 
+
+private slots:
+    // 数据协议
+
+    // 新增一行
+    void on_addRowBtn_clicked();
+    // 删除选定行
+    void on_delRowBtn_clicked();
 };
 
 #endif // MAINWINDOW_H
