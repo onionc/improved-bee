@@ -5,6 +5,8 @@
 #include <QComboBox>
 
 
+// 表格的下拉框代理
+
 class ComboboxDelegate : public QItemDelegate
 {
     Q_OBJECT

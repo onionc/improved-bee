@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     comboboxdelegate.cpp \
-    datatype.cpp
+    datatype.cpp \
+    tablewidgetdrag.cpp
 
 HEADERS += \
         mainwindow.h \
     comboboxdelegate.h \
-    datatype.h
+    datatype.h \
+    tablewidgetdrag.h
 
 FORMS += \
         mainwindow.ui

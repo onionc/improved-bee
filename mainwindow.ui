@@ -148,7 +148,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QTableWidget" name="tableWidget"/>
+        <widget class="TableWidgetDrag" name="tableWidget"/>
        </item>
       </layout>
      </item>
@@ -157,6 +157,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TableWidgetDrag</class>
+   <extends>QTableWidget</extends>
+   <header>tablewidgetdrag.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="res.qrc"/>
  </resources>

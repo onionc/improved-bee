@@ -25,6 +25,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // 竖直滚动条
     ui->tableWidget->setItemDelegateForColumn(colType,&comboboxDelegate);   //委托
 
+    ui->tableWidget->setDragEnabled(true); // 开启拖拽
+    ui->tableWidget->setDragDropMode(QAbstractItemView::InternalMove );  // 拖拽，内部移动
+    ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
+
+
     ui->tableWidget->insertRow(0); // 插入一行
     addRow(0, FRAME_HEADER, "char", "0xAA");
 
@@ -107,11 +113,17 @@ void MainWindow::on_addRowBtn_clicked()
 {
     int curRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(curRow);
-    addRow(curRow);
+    QString name  = QString("name_%1").arg(curRow+1);
+    addRow(curRow, name);
+
+    // 选定新行
+    ui->tableWidget->selectRow(curRow);
 }
 
 // 删除选定行
 void MainWindow::on_delRowBtn_clicked()
 {
     ui->tableWidget->removeRow(ui->tableWidget->currentRow());
+
+    ui->tableWidget->selectRow(ui->tableWidget->currentRow());
 }

@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "comboboxdelegate.h"
+#include "tablewidgetdrag.h"
+#include <QDebug>
 
 namespace Ui {
 class MainWindow;
