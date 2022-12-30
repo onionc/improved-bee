@@ -42,8 +42,14 @@ private slots:
     void on_addRowBtn_clicked();
     // 删除选定行
     void on_delRowBtn_clicked();
+    // 添加帧头
     void on_addHeaderBtn_clicked();
+    // 添加校验和
     void on_addCheckSumBtn_clicked();
+    // 保存协议
+    void on_saveFrameBtn_clicked();
+    // 加载协议
+    void on_loadFrameBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

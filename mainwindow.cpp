@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QComboBox>
+#include "util.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,6 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
     on_addHeaderBtn_clicked(); // 插入一行帧头
+
+    // 日志
+    util::logInit();
+    PLOGD<<"test";
 
 }
 
@@ -148,4 +153,16 @@ void MainWindow::on_addCheckSumBtn_clicked()
 
     // 选定新行
     ui->tableWidget->selectRow(curRow);
+}
+
+// 保存协议
+void MainWindow::on_saveFrameBtn_clicked()
+{
+
+}
+
+// 加载协议
+void MainWindow::on_loadFrameBtn_clicked()
+{
+
 }

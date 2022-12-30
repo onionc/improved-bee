@@ -4,6 +4,7 @@
 #
 #-------------------------------------------------
 
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -28,13 +29,17 @@ SOURCES += \
         mainwindow.cpp \
     comboboxdelegate.cpp \
     datatype.cpp \
-    tablewidgetdrag.cpp
+    tablewidgetdrag.cpp \
+    util.cpp \
+    XString.cpp
 
 HEADERS += \
         mainwindow.h \
     comboboxdelegate.h \
     datatype.h \
-    tablewidgetdrag.h
+    tablewidgetdrag.h \
+    util.h \
+    XString.h
 
 FORMS += \
         mainwindow.ui
@@ -42,3 +47,8 @@ FORMS += \
 RESOURCES += \
     res.qrc
 
+INCLUDEPATH += include
+
+
+#debug
+QMAKE_CXXFLAGS_DEBUG += -gstabs+
