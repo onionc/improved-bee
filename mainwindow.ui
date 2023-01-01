@@ -47,6 +47,9 @@
            <bold>true</bold>
           </font>
          </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
          <property name="frameShape">
           <enum>QFrame::Box</enum>
          </property>
@@ -59,13 +62,16 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
+         <property name="tabSpacing">
+          <number>6</number>
+         </property>
          <widget class="QWidget" name="page">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>224</height>
+            <height>209</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -76,13 +82,46 @@
            <string>数据协议</string>
           </attribute>
           <layout class="QFormLayout" name="formLayout">
+           <property name="horizontalSpacing">
+            <number>1</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>1</number>
+           </property>
+           <property name="leftMargin">
+            <number>1</number>
+           </property>
+           <property name="topMargin">
+            <number>4</number>
+           </property>
+           <property name="rightMargin">
+            <number>1</number>
+           </property>
+           <property name="bottomMargin">
+            <number>4</number>
+           </property>
            <item row="0" column="0">
             <widget class="QPushButton" name="addRowBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <weight>50</weight>
                <bold>false</bold>
               </font>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
              </property>
              <property name="text">
               <string>添加行</string>
@@ -91,6 +130,18 @@
            </item>
            <item row="0" column="1">
             <widget class="QPushButton" name="delRowBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <weight>50</weight>
@@ -104,6 +155,18 @@
            </item>
            <item row="1" column="0">
             <widget class="QPushButton" name="addHeaderBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <weight>50</weight>
@@ -117,6 +180,18 @@
            </item>
            <item row="1" column="1">
             <widget class="QPushButton" name="addCheckSumBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <weight>50</weight>
@@ -130,6 +205,18 @@
            </item>
            <item row="2" column="0">
             <widget class="QPushButton" name="saveFrameBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <weight>50</weight>
@@ -143,6 +230,18 @@
            </item>
            <item row="2" column="1">
             <widget class="QPushButton" name="loadFrameBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <weight>50</weight>
@@ -162,7 +261,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>224</height>
+            <height>209</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -179,7 +278,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>224</height>
+            <height>209</height>
            </rect>
           </property>
           <attribute name="icon">
