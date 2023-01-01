@@ -158,6 +158,11 @@ void MainWindow::on_addCheckSumBtn_clicked()
 // 保存协议
 void MainWindow::on_saveFrameBtn_clicked()
 {
+    util::WriteFile wf;
+    if(wf.open("data/test.cfg")){
+        qDebug()<<wf.getFilePath();
+        wf.write("协议...");
+    }
 
 }
 

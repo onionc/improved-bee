@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include <QString>
+#include <fstream>
 #include <QDateTime>
 #include <QDir>
 #include "plog/Log.h"
@@ -25,34 +26,25 @@ namespace util{
     // string GetPathDir(string filePath);
 
 
-    /*
-
-
-
-
     // 写文件
     class WriteFile{
         private:
-            string filePath;
+            QString filePath;
         public:
-            ofstream *ostrm;
+            std::ofstream *ostrm;
             WriteFile();
             ~WriteFile();
 
-
-
-            // 打开文件，指定目录和文件名, 如果是本目录下，可填（.\\ 或 .）
-            bool open(string dir, string fileName);
+            // 打开文件，如果是本目录，可用"./"表示或只写文件名称
+            bool open(QString path);
             void close();
 
             // 写数据
-            void write(string s);
-            void write(int t);
-            void write(double t);
+            void write(QString s);
             // 返回文件名
-            string util::WriteFile::getFilePath();
+            QString getFilePath();
     };
-
+    /*
     // 分割字符串，分隔符可指定子字符串
     vector<CString> splitCString(CString s, CString split);
     vector<string> splitCString(string s, string split);

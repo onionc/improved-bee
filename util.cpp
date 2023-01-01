@@ -69,3 +69,51 @@ void util::logInit(long maxSize){
     }
 
 }
+
+
+// 创建文件
+util::WriteFile::WriteFile():ostrm(NULL), filePath(""){}
+util::WriteFile::~WriteFile(){close();}
+
+void util::WriteFile::close(){
+    if(ostrm && ostrm->is_open()){
+        ostrm->close();
+    }
+}
+
+bool util::WriteFile::open(QString path){
+    // 拆分目录和文件名
+    int i = path.lastIndexOf('/');
+    QString dirName="",filename="";
+
+    filename = path.mid(i+1);
+    if(filename.isEmpty()){
+        return false;
+    }
+
+    if(i>0){
+        // 有目录
+        dirName = createDir(path.mid(0, i));
+        filePath = dirName+"/"+filename;
+    }else{
+        filePath = filename;
+    }
+
+    // 创建文件
+    ostrm = new ofstream(XString::QSToChar(filePath), ios::app|ios::binary);
+    if(ostrm->is_open()){
+        return true;
+    }
+
+    return false;
+}
+
+void util::WriteFile::write(QString s){
+    if(ostrm->is_open()){
+        *ostrm << XString::QSToChar(s);
+    }
+}
+
+QString util::WriteFile::getFilePath(){
+    return filePath;
+}
