@@ -5,6 +5,10 @@
 #include "comboboxdelegate.h"
 #include "tablewidgetdrag.h"
 #include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
+#include <QTextCodec>
 
 namespace Ui {
 class MainWindow;

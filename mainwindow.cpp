@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
-    on_addHeaderBtn_clicked(); // 插入一行帧头
+    //on_addHeaderBtn_clicked(); // 插入一行帧头
 
     // 日志
     util::logInit();
@@ -158,16 +158,54 @@ void MainWindow::on_addCheckSumBtn_clicked()
 // 保存协议
 void MainWindow::on_saveFrameBtn_clicked()
 {
-    util::WriteFile wf;
-    if(wf.open("data/test.cfg")){
-        qDebug()<<wf.getFilePath();
-        wf.write("协议...");
+    // 创建目录
+    QString dir = util::createDir("config");
+
+    QString filter = "协议文件(*.ini);;所有文件(*.*)";
+    QString saveFilename = QFileDialog::getSaveFileName(this, " 另存为", dir, filter);
+
+    if(saveFilename.isEmpty()){
+        QMessageBox::warning(this, "保存失败", "文件名为空");
+        return;
     }
 
+    // 保存数据到ini文件
+    QSettings write(saveFilename, QSettings::IniFormat);
+    write.setIniCodec(QTextCodec::codecForName("UTF-8"));
+    write.clear();
+    for(int i=0; i<ui->tableWidget->rowCount(); i++) {
+        write.setValue(QString("%1/name").arg(i), ui->tableWidget->item(i, colName)->text());
+        write.setValue(QString("%1/type").arg(i), ui->tableWidget->item(i, colType)->text());
+        write.setValue(QString("%1/data").arg(i), ui->tableWidget->item(i, colData)->text());
+    }
 }
 
 // 加载协议
 void MainWindow::on_loadFrameBtn_clicked()
 {
+    // 创建目录
+    QString dir = util::createDir("config");
+
+    QString filter = "协议文件(*.ini);;所有文件(*.*)";
+    QString loadFilename = QFileDialog::getOpenFileName(this, " 加载文件", dir, filter);
+    if(loadFilename.isEmpty()){
+        QMessageBox::warning(this, "打开失败", "文件名为空");
+        return;
+    }
+
+    // 打开ini文件
+    QSettings read(loadFilename, QSettings::IniFormat);
+    QStringList allKeys = read.childGroups();
+    QString name, type, data;
+    foreach(QString key, allKeys){
+        int curRow = ui->tableWidget->rowCount();
+        ui->tableWidget->insertRow(curRow);
+
+        name = read.value(QString("%1/name").arg(key)).toString();
+        type = read.value(QString("%1/type").arg(key)).toString();
+        data = read.value(QString("%1/data").arg(key)).toString();
+        addRow(curRow, name, type, data);
+    }
+
 
 }
