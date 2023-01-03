@@ -43,8 +43,8 @@
           <font>
            <family>Microsoft YaHei UI</family>
            <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="layoutDirection">
@@ -55,6 +55,9 @@
          </property>
          <property name="frameShadow">
           <enum>QFrame::Sunken</enum>
+         </property>
+         <property name="lineWidth">
+          <number>1</number>
          </property>
          <property name="midLineWidth">
           <number>1</number>
@@ -71,7 +74,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>203</height>
+            <height>224</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -253,6 +256,28 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QPushButton" name="confirmFrameBtn">
+             <property name="minimumSize">
+              <size>
+               <width>182</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>182</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>确认数据协议</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="page_2">
@@ -261,7 +286,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>203</height>
+            <height>224</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -278,7 +303,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>203</height>
+            <height>224</height>
            </rect>
           </property>
           <attribute name="icon">

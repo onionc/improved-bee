@@ -56,6 +56,10 @@ private slots:
     void on_loadFrameBtn_clicked();
     // 清空表格
     void clearTable();
+    // 确认数据协议
+    void on_confirmFrameBtn_clicked(bool checked);
+    // 使能/失能 协议按钮
+    void enableFrameBtn(bool state);
 };
 
 #endif // MAINWINDOW_H

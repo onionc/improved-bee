@@ -31,11 +31,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
+    // 协议
     on_addHeaderBtn_clicked(); // 插入一行帧头
+    ui->confirmFrameBtn->setCheckable(true);
+    ui->confirmFrameBtn->setChecked(false);
 
     // 日志
     util::logInit();
-    PLOGD<<"test";
+
+
 
 }
 
@@ -221,4 +225,33 @@ void MainWindow::on_loadFrameBtn_clicked()
         curRow++;
     }
 
+}
+
+// 确认数据帧
+void MainWindow::on_confirmFrameBtn_clicked(bool checked)
+{
+    if(checked){
+        ui->confirmFrameBtn->setText("编辑数据协议");
+        // 失能表格；失能按键
+        ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        enableFrameBtn(false);
+
+    }else{
+        ui->confirmFrameBtn->setText("确认数据协议");
+        // 使能表格；使能按键
+        enableFrameBtn(true);
+        ui->tableWidget->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
+
+    }
+}
+
+// 使能/失能 协议按钮
+void MainWindow::enableFrameBtn(bool state){
+    QList<QPushButton *> pushButtons = ui->page->findChildren<QPushButton *>();
+    foreach(QPushButton *a, pushButtons){
+        if(a==ui->confirmFrameBtn){
+            continue;
+        }
+        a->setEnabled(state);
+    }
 }
