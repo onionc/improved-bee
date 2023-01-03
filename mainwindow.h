@@ -54,6 +54,8 @@ private slots:
     void on_saveFrameBtn_clicked();
     // 加载协议
     void on_loadFrameBtn_clicked();
+    // 清空表格
+    void clearTable();
 };
 
 #endif // MAINWINDOW_H

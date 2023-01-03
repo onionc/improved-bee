@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
-    //on_addHeaderBtn_clicked(); // 插入一行帧头
+    on_addHeaderBtn_clicked(); // 插入一行帧头
 
     // 日志
     util::logInit();
@@ -80,7 +80,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     ui->tableWidget->setItem(curRow, colCurve1, item);
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         // 特殊项不可选择绘图
-        item->setFlags(item->flags() & (Qt::NoItemFlags));
+        item->setFlags(Qt::NoItemFlags);
     }else{
         // 默认不选定
         item->setCheckState(Qt::Unchecked);
@@ -91,7 +91,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     item = new QTableWidgetItem("", typeValue++);
     ui->tableWidget->setItem(curRow, colCurve2, item);
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
-        item->setFlags(item->flags() & (Qt::NoItemFlags));
+        item->setFlags(Qt::NoItemFlags);
     }else{
         item->setCheckState(Qt::Unchecked);
         item->setFlags(item->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
@@ -101,10 +101,10 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     item = new QTableWidgetItem("", typeValue++);
     ui->tableWidget->setItem(curRow, colCurve3, item);
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
-        item->setFlags(item->flags() & (Qt::NoItemFlags));
+        item->setFlags(Qt::NoItemFlags);
     }else{
         item->setCheckState(Qt::Unchecked);
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
+        item->setFlags(item->flags()  & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
 }
@@ -180,6 +180,15 @@ void MainWindow::on_saveFrameBtn_clicked()
     }
 }
 
+// 清除表格数据
+void MainWindow::clearTable(){
+    int i = ui->tableWidget->rowCount()-1;
+    for(; i>=0; i--)
+    {
+        ui->tableWidget->removeRow(i);
+    }
+}
+
 // 加载协议
 void MainWindow::on_loadFrameBtn_clicked()
 {
@@ -193,19 +202,23 @@ void MainWindow::on_loadFrameBtn_clicked()
         return;
     }
 
+    // 清除
+    clearTable();
+
     // 打开ini文件
     QSettings read(loadFilename, QSettings::IniFormat);
     QStringList allKeys = read.childGroups();
     QString name, type, data;
+    int curRow = ui->tableWidget->rowCount();
     foreach(QString key, allKeys){
-        int curRow = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(curRow);
 
         name = read.value(QString("%1/name").arg(key)).toString();
         type = read.value(QString("%1/type").arg(key)).toString();
         data = read.value(QString("%1/data").arg(key)).toString();
         addRow(curRow, name, type, data);
-    }
 
+        curRow++;
+    }
 
 }
