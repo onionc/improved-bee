@@ -19,13 +19,6 @@ namespace util{
     // 日志初始化
     void logInit(long maxSize=1024*1024*10);
 
-    // 打印数组到日志中
-    // void log(BYTE* arr, size_t len);
-
-    // 得到文件路径的目录
-    // string GetPathDir(string filePath);
-
-
     // 写文件
     class WriteFile{
         private:
@@ -44,49 +37,6 @@ namespace util{
             // 返回文件名
             QString getFilePath();
     };
-    /*
-    // 分割字符串，分隔符可指定子字符串
-    vector<CString> splitCString(CString s, CString split);
-    vector<string> splitCString(string s, string split);
-
-    // 获取目录下的所有文件
-    void GetFiles(string path, vector<string>& files);
-
-    typedef struct{
-        char drove[20]; // 盘符
-        char dir[200]; // 目录
-        char name[200]; // 文件名
-        char ext[20]; // 后缀
-
-        // 拆分文件路径
-        void split(string file){
-            memset(this, 0, sizeof(FILE_FULL_PATH));
-            _splitpath(file.c_str(), drove, dir, name, ext);
-        }
-
-        // 合并（获取）文件路径
-        string getPath(){
-            CString temp;
-            temp.Format("%s%s%s%s", drove, dir, name, ext);
-            return temp.GetString();
-        }
-
-        // 分别获取路径和文件名
-        string getDir(){
-            CString temp;
-            temp.Format("%s%s", drove, dir);
-            return temp.GetString();
-        }
-        string getFilename(){
-            CString temp;
-            temp.Format("%s%s", name, ext);
-            return temp.GetString();
-        }
-
-    }FILE_FULL_PATH; // 文件路径
-    void SplitPath(CString file, FILE_FULL_PATH *fileFullPathP);
-
-    */
 }
 
 
