@@ -31,7 +31,7 @@ private:
     // 表格
     ComboboxDelegate comboboxDelegate; // // 下拉框代理
     enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
-    void addRow(int curRow, QString name="<name>", QString type="char", QString data=""); // 表格新增一行
+    void addRow(int curRow, QString name="<name>", QString type="char", QString data="", Qt::CheckState checked=Qt::Checked, Qt::CheckState curve1Checked=Qt::Unchecked, Qt::CheckState curve2Checked=Qt::Unchecked, Qt::CheckState curve3Checked=Qt::Unchecked); // 表格新增一行
 
     // 数据协议
     const char* FRAME_HEADER = "Frame_Header";

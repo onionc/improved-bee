@@ -50,7 +50,7 @@ MainWindow::~MainWindow()
 
 
 // 表格新增一行
-void MainWindow::addRow(int curRow, QString name, QString type, QString data){
+void MainWindow::addRow(int curRow, QString name, QString type, QString data, Qt::CheckState checked, Qt::CheckState curve1Checked, Qt::CheckState curve2Checked, Qt::CheckState curve3Checked){
     QTableWidgetItem *item;
 
     int typeValue = 1000; // type>=1000 自定义类型
@@ -63,7 +63,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
         item->setFlags(item->flags() & (~Qt::ItemIsEditable));
     }else{
         // 可选定
-        item->setCheckState(Qt::Checked);
+        item->setCheckState(checked);
     }
 
     // 数据类型
@@ -87,7 +87,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
         item->setFlags(Qt::NoItemFlags);
     }else{
         // 默认不选定
-        item->setCheckState(Qt::Unchecked);
+        item->setCheckState(curve1Checked);
         item->setFlags(item->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
@@ -97,7 +97,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         item->setFlags(Qt::NoItemFlags);
     }else{
-        item->setCheckState(Qt::Unchecked);
+        item->setCheckState(curve1Checked);
         item->setFlags(item->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
@@ -107,7 +107,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data){
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         item->setFlags(Qt::NoItemFlags);
     }else{
-        item->setCheckState(Qt::Unchecked);
+        item->setCheckState(curve1Checked);
         item->setFlags(item->flags()  & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
@@ -178,9 +178,18 @@ void MainWindow::on_saveFrameBtn_clicked()
     write.setIniCodec(QTextCodec::codecForName("UTF-8"));
     write.clear();
     for(int i=0; i<ui->tableWidget->rowCount(); i++) {
+        // 是否选定
+        write.setValue(QString("%1/checked").arg(i), ui->tableWidget->item(i, colName)->checkState()==Qt::Checked?1:0);
+
+        // 名称、类型、数据
         write.setValue(QString("%1/name").arg(i), ui->tableWidget->item(i, colName)->text());
         write.setValue(QString("%1/type").arg(i), ui->tableWidget->item(i, colType)->text());
         write.setValue(QString("%1/data").arg(i), ui->tableWidget->item(i, colData)->text());
+
+        // 图表绘图项是否选定
+        write.setValue(QString("%1/curve1").arg(i), ui->tableWidget->item(i, colCurve1)->checkState()==Qt::Checked);
+        write.setValue(QString("%1/curve2").arg(i), ui->tableWidget->item(i, colCurve2)->checkState()==Qt::Checked);
+        write.setValue(QString("%1/curve3").arg(i), ui->tableWidget->item(i, colCurve3)->checkState()==Qt::Checked);
     }
 }
 
@@ -211,16 +220,24 @@ void MainWindow::on_loadFrameBtn_clicked()
 
     // 打开ini文件
     QSettings read(loadFilename, QSettings::IniFormat);
-    QStringList allKeys = read.childGroups();
+    QStringList allGroups = read.childGroups();
     QString name, type, data;
     int curRow = ui->tableWidget->rowCount();
-    foreach(QString key, allKeys){
+    // 选定状态：行选定（在第一个item下），图1，图2，图3
+    Qt::CheckState line, curve1, curve2, curve3;
+    foreach(QString groupKey, allGroups){
         ui->tableWidget->insertRow(curRow);
 
-        name = read.value(QString("%1/name").arg(key)).toString();
-        type = read.value(QString("%1/type").arg(key)).toString();
-        data = read.value(QString("%1/data").arg(key)).toString();
-        addRow(curRow, name, type, data);
+        name = read.value(QString("%1/name").arg(groupKey)).toString();
+        type = read.value(QString("%1/type").arg(groupKey)).toString();
+        data = read.value(QString("%1/data").arg(groupKey)).toString();
+
+        line = read.value(QString("%1/checked").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
+        curve1 = read.value(QString("%1/curve1").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
+        curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
+        curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
+
+        addRow(curRow, name, type, data, line, curve1, curve2, curve3);
 
         curRow++;
     }
@@ -234,6 +251,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         ui->confirmFrameBtn->setText("编辑数据协议");
         // 失能表格；失能按键
         ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
         enableFrameBtn(false);
 
     }else{
@@ -249,7 +267,8 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 void MainWindow::enableFrameBtn(bool state){
     QList<QPushButton *> pushButtons = ui->page->findChildren<QPushButton *>();
     foreach(QPushButton *a, pushButtons){
-        if(a==ui->confirmFrameBtn){
+        // 仅保存和确认数据按钮可用
+        if(a==ui->confirmFrameBtn || a==ui->saveFrameBtn){
             continue;
         }
         a->setEnabled(state);
