@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 
-QT       += core gui
+QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,7 +31,9 @@ SOURCES += \
     datatype.cpp \
     tablewidgetdrag.cpp \
     util.cpp \
-    XString.cpp
+    XString.cpp \
+    serialPort/serialport.cpp \
+    serialPort/serialcombox.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,7 +41,9 @@ HEADERS += \
     datatype.h \
     tablewidgetdrag.h \
     util.h \
-    XString.h
+    XString.h \
+    serialPort/serialport.h \
+    serialPort/serialcombox.h
 
 FORMS += \
         mainwindow.ui

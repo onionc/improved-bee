@@ -42,6 +42,38 @@ MainWindow::MainWindow(QWidget *parent) :
     // 日志
     util::logInit();
 
+    // 串口设置
+    QStringList baudrate, dataBit, stopBit, parity;
+    baudrate<<"4800"<<"9600"<<"19200"<<"115200"<<"230400"<<"921600";
+    ui->baudrate_comboBox->addItems(baudrate);
+    ui->baudrate_comboBox->setCurrentText("115200");
+    dataBit<<"5"<<"6"<<"7"<<"8";
+    ui->dataBits_comboBox->addItems(dataBit);
+    ui->dataBits_comboBox->setCurrentText("8");
+    stopBit<<"1"<<"1.5"<<"2";
+    ui->stopBit_comboBox->addItems(stopBit);
+    ui->stopBit_comboBox->setCurrentText("1");
+    parity<<"无"<<"奇校验"<<"偶校验";
+    ui->parity_comboBox->addItems(parity);
+    ui->parity_comboBox->setCurrentText(0);
+
+
+    // 状态设置
+    isOpenSerialPort = false; // 串口状态 关
+
+    // 串口线程创建
+    serialPortThread = new QThread();
+    serialPort = new SerialPort();
+    serialPort->moveToThread(serialPortThread); // 串口和线程关联
+    serialPortThread->start(); // 开启线程
+
+    connect(serialPortThread, &QThread::started, serialPort, &SerialPort::init); // 线程准备好后，初始化串口对象
+    connect(ui->comPort_comboBox, &SerialComBox::detectComPorts, serialPort, &SerialPort::updatePortList); // 下拉的监测端口信号和更新界面绑定
+    connect(serialPort,&SerialPort::getPortList,ui->comPort_comboBox,&SerialComBox::updateItem);  //检测后更新串口号
+
+
+
+
 
 
 }

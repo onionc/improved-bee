@@ -9,6 +9,9 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QTextCodec>
+#include <QThread>
+#include "serialPort/serialport.h"
+#include "serialPort/serialcombox.h"
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +40,12 @@ private:
     const char* FRAME_HEADER = "Frame_Header";
     const char* FRAME_END = "Frame_Tail"; // 帧尾暂时没用到
     const char* FRAME_CHECK = "Check_Sum";
+
+    // 串口
+    bool isOpenSerialPort; // 串口是否打开
+    QThread *serialPortThread = nullptr; // 串口线程
+    SerialPort* serialPort = nullptr; // 串口对象
+
 
 
 private slots:
