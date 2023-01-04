@@ -31,6 +31,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
+    // toolBox控制界面设置
+    ui->panelBox->setCurrentIndex(0); // 默认第一页
+
     // 协议
     on_addHeaderBtn_clicked(); // 插入一行帧头
     ui->confirmFrameBtn->setCheckable(true);
@@ -251,7 +254,6 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         ui->confirmFrameBtn->setText("编辑数据协议");
         // 失能表格；失能按键
         ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        ui->tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
         enableFrameBtn(false);
 
     }else{
