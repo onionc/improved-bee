@@ -28,7 +28,7 @@
       <number>5</number>
      </property>
      <item>
-      <widget class="QLabel" name="led">
+      <widget class="LedLabel" name="led">
        <property name="minimumSize">
         <size>
          <width>10</width>
@@ -99,7 +99,7 @@
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="tabSpacing">
           <number>6</number>
@@ -619,12 +619,17 @@
   <customwidget>
    <class>TableWidgetDrag</class>
    <extends>QTableWidget</extends>
-   <header>tablewidgetdrag.h</header>
+   <header>ui/tablewidgetdrag.h</header>
   </customwidget>
   <customwidget>
    <class>SerialComBox</class>
    <extends>QComboBox</extends>
    <header>serialPort/serialcombox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LedLabel</class>
+   <extends>QLabel</extends>
+   <header>ui/ledlabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

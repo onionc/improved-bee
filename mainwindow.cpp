@@ -73,7 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // 图像相关
-    setLed(ui->led, 0, 15); // 设定LED为灰色
+    ui->led->setSize(15);
+    ui->led->setColor(0); // 设定LED为灰色
 
 }
 
@@ -310,27 +311,4 @@ void MainWindow::enableFrameBtn(bool state){
 
 
 // ----------------------------- 图像相关 ----------------------------
-void MainWindow::setLed(QLabel *label, int color, unsigned short size){
-    label->setText("");
 
-    // 背景色
-    QString backgroundColor("background-color:");
-    switch(color){
-        case 1:
-            // red
-            backgroundColor += "#AA2222";
-            break;
-        case 2:
-            // green
-            backgroundColor += "#339933";
-            break;
-        case 0:
-        default:
-            // gray
-            backgroundColor += "#a0a0a0";
-            break;
-    }
-
-    QString style = QString("min-width:%1px;min-height:%1px;max-width:%1px;max-height:%1px;border-radius:%2px;%3;").arg(size).arg(size/2).arg(backgroundColor);
-    label->setStyleSheet(style);
-}

@@ -27,23 +27,25 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    comboboxdelegate.cpp \
     datatype.cpp \
-    tablewidgetdrag.cpp \
     util.cpp \
     XString.cpp \
     serialPort/serialport.cpp \
-    serialPort/serialcombox.cpp
+    serialPort/serialcombox.cpp \
+    ui/comboboxdelegate.cpp \
+    ui/tablewidgetdrag.cpp \
+    ui/ledlabel.cpp
 
 HEADERS += \
         mainwindow.h \
-    comboboxdelegate.h \
     datatype.h \
-    tablewidgetdrag.h \
     util.h \
     XString.h \
     serialPort/serialport.h \
-    serialPort/serialcombox.h
+    serialPort/serialcombox.h \
+    ui/comboboxdelegate.h \
+    ui/tablewidgetdrag.h \
+    ui/ledlabel.h
 
 FORMS += \
         mainwindow.ui

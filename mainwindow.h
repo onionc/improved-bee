@@ -9,8 +9,8 @@
 #include <QTextCodec>
 #include <QThread>
 #include <QLabel>
-#include "comboboxdelegate.h"
-#include "tablewidgetdrag.h"
+#include "ui/comboboxdelegate.h"
+#include "ui/tablewidgetdrag.h"
 #include "serialPort/serialport.h"
 #include "serialPort/serialcombox.h"
 
@@ -47,14 +47,6 @@ private:
     QThread *serialPortThread = nullptr; // 串口线程
     SerialPort* serialPort = nullptr; // 串口对象
 
-    // 图像相关
-    /**
-     * @brief setLed 设置label为LED
-     * @param label
-     * @param color 颜色：0 gray, 1 red, 2green
-     * @param size 大小，单位像素
-     */
-    void setLed(QLabel *label, int color, unsigned short size);
 
 
 private slots:
