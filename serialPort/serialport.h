@@ -31,12 +31,29 @@ private:
     QByteArray recvBuf;
 
 signals:
-    // 获取端口列表
-    void getPortList(QStringList ports);
+    // 获取端口列表信号
+    void signal_getPortList(QStringList ports);
+
+    // 串口打开时的信号
+    void signal_serialPortOpenState(bool checked);
+    // 串口关闭时的信号
+    void signal_serialPortCloseState(bool checked);
 
 public slots:
     // 更新端口列表
     void updatePortList();
+
+    /**
+     * @brief openSerialPort 打开串口
+     * @param portName 串口名
+     * @param baudrate 波特率
+     * @param dataBits 数据位：5 6 7 8
+     * @param stopBits 停止位：1-1个停止位，2-2个停止位，3-1.5个停止位
+     * @param parity 校验位:0-无校验，2-偶校验，3-奇检验，4-space校验，5-mark校验
+     */
+    void slot_openSerialPort(QString portName, int baudrate, qint8 dataBits, qint8 stopBits, qint8 parity);
+    // 关闭串口
+    void slot_closeSerialPort();
 
 };
 

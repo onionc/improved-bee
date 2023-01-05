@@ -26,9 +26,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
-
-
 private:
     Ui::MainWindow *ui;
 
@@ -50,7 +47,7 @@ private:
 
 
 private slots:
-    // 数据协议
+    // ---- 数据协议 ----
 
     // 新增一行
     void on_addRowBtn_clicked();
@@ -70,6 +67,20 @@ private slots:
     void on_confirmFrameBtn_clicked(bool checked);
     // 使能/失能 协议按钮
     void enableFrameBtn(bool state);
+
+    // 打开和关闭串口
+    void on_openPortBtn_clicked(bool checked);
+
+    // 串口打开时的信号变化
+    void slot_serialPortOpenState(bool checked);
+    // 串口关闭时的信号变化
+    void slot_serialPortCloseState(bool checked);
+
+signals:
+    // 打开串口信号
+    void signal_openSerialPort(QString portName, int baudrate, qint8 dataBits, qint8 stopBits, qint8 parity);
+    // 关闭串口信号
+    void signal_closeSerialPort();
 };
 
 #endif // MAINWINDOW_H

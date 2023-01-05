@@ -99,7 +99,7 @@
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="tabSpacing">
           <number>6</number>
@@ -364,6 +364,28 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="1">
+            <widget class="SerialComBox" name="comPort_comboBox">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_2">
              <property name="minimumSize">
@@ -386,103 +408,6 @@
              </property>
              <property name="text">
               <string>波特率</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="minimumSize">
-              <size>
-               <width>60</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>60</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>数据位</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_4">
-             <property name="minimumSize">
-              <size>
-               <width>60</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>60</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>停止位</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="minimumSize">
-              <size>
-               <width>60</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>60</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>校验位</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="SerialComBox" name="comPort_comboBox">
-             <property name="minimumSize">
-              <size>
-               <width>90</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>90</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
              </property>
             </widget>
            </item>
@@ -511,6 +436,31 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="minimumSize">
+              <size>
+               <width>60</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>60</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>数据位</string>
+             </property>
+            </widget>
+           </item>
            <item row="2" column="1">
             <widget class="QComboBox" name="dataBits_comboBox">
              <property name="minimumSize">
@@ -530,6 +480,31 @@
                <weight>50</weight>
                <bold>false</bold>
               </font>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_4">
+             <property name="minimumSize">
+              <size>
+               <width>60</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>60</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>停止位</string>
              </property>
             </widget>
            </item>
@@ -555,6 +530,31 @@
              </property>
             </widget>
            </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="minimumSize">
+              <size>
+               <width>60</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>60</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>校验位</string>
+             </property>
+            </widget>
+           </item>
            <item row="4" column="1">
             <widget class="QComboBox" name="parity_comboBox">
              <property name="minimumSize">
@@ -574,6 +574,47 @@
                <weight>50</weight>
                <bold>false</bold>
               </font>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="6" column="1">
+            <widget class="QPushButton" name="openPortBtn">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>打开串口</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

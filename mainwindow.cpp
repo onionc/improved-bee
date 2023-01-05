@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stopBit<<"1"<<"1.5"<<"2";
     ui->stopBit_comboBox->addItems(stopBit);
     ui->stopBit_comboBox->setCurrentText("1");
-    parity<<"无"<<"奇校验"<<"偶校验";
+    parity<<"无"<<"奇校验"<<"偶校验"<<"Space"<<"Mask";
     ui->parity_comboBox->addItems(parity);
     ui->parity_comboBox->setCurrentText(0);
 
@@ -69,7 +69,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(serialPortThread, &QThread::started, serialPort, &SerialPort::init); // 线程准备好后，初始化串口对象
     connect(ui->comPort_comboBox, &SerialComBox::detectComPorts, serialPort, &SerialPort::updatePortList); // 下拉的监测端口信号和更新界面绑定
-    connect(serialPort,&SerialPort::getPortList,ui->comPort_comboBox,&SerialComBox::updateItem);  //检测后更新串口号
+    connect(serialPort,&SerialPort::signal_getPortList,ui->comPort_comboBox,&SerialComBox::updateItem);  //检测后更新串口号
+
+    connect(this, &MainWindow::signal_openSerialPort, serialPort, &SerialPort::slot_openSerialPort); // 打开串口
+    connect(this, &MainWindow::signal_closeSerialPort, serialPort, &SerialPort::slot_closeSerialPort); // 关闭串口
+
+    connect(serialPort, &SerialPort::signal_serialPortOpenState, this, &MainWindow::slot_serialPortOpenState); // 串口打开时状态
+    connect(serialPort, &SerialPort::signal_serialPortCloseState, this, &MainWindow::slot_serialPortCloseState); // 串口关闭时状态
 
 
     // 图像相关
@@ -297,7 +303,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
     }
 }
 
-// 使能/失能 协议按钮
+// 使能/失能 协议编辑按钮
 void MainWindow::enableFrameBtn(bool state){
     QList<QPushButton *> pushButtons = ui->page->findChildren<QPushButton *>();
     foreach(QPushButton *a, pushButtons){
@@ -310,5 +316,85 @@ void MainWindow::enableFrameBtn(bool state){
 }
 
 
-// ----------------------------- 图像相关 ----------------------------
+// ----------------------------- 串口 ----------------------------
+// 打开和关闭串口
+void MainWindow::on_openPortBtn_clicked(bool checked)
+{
 
+    if(checked){
+        // 打开串口
+
+        // 串口名称，波特率，数据位，停止位，校验
+        QString name     = ui->comPort_comboBox->currentText();
+        qint32  baudrate = ui->baudrate_comboBox->currentText().toInt();
+        quint8   dataBits = ui->dataBits_comboBox->currentText().toInt();
+        quint8   stopBits = ui->stopBit_comboBox->currentIndex();
+        quint8   parity   = ui->parity_comboBox->currentIndex();
+
+        switch(stopBits)
+        {
+            case 1: stopBits = 3; break;  // 1.5个停止位
+            case 2: stopBits = 2; break;  // 2个停止位
+            case 0:
+            default:
+                stopBits = 1; // 1个停止位
+            break;
+        }
+
+        switch(parity)
+        {
+            case 1: parity = 2; break;   //偶校验
+            case 2: parity = 3; break;   //奇校验
+            case 3: parity = 4; break; // space
+            case 4: parity = 5; break; // mark
+            case 0:
+            default:
+                parity = 0; //无校验
+                break;
+        }
+
+        emit signal_openSerialPort(name, baudrate, dataBits, stopBits, parity);
+
+    }
+    else{
+        //关闭串口
+
+        emit signal_closeSerialPort();
+    }
+
+}
+
+
+
+// 串口打开时的信号变化
+void MainWindow::slot_serialPortOpenState(bool checked){
+    if(checked){
+        enableFrameBtn(false); // 失能协议编辑按钮
+        ui->led->setColor(2); // 点亮led（绿色）
+
+        ui->openPortBtn->setText("断开串口");
+
+    }else{
+        enableFrameBtn(true);
+        ui->led->setColor(1); // 红色
+
+        ui->openPortBtn->setChecked(false);
+        QMessageBox::critical(this, "失败", "串口打开失败");
+    }
+}
+
+// 串口关闭时的信号变化
+void MainWindow::slot_serialPortCloseState(bool checked){
+    if(checked){
+        enableFrameBtn(true);
+        ui->led->setColor(0); // 灰色
+        ui->openPortBtn->setText("连接串口");
+    }else{
+        enableFrameBtn(false);
+        ui->led->setColor(2); // 红色
+
+        ui->openPortBtn->setChecked(true);
+        QMessageBox::critical(this, "失败", "串口关闭失败");
+    }
+
+}
