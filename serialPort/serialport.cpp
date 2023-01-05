@@ -15,10 +15,6 @@ void SerialPort::init(){
     qSerialPort = new QSerialPort(this);
     qSerialPort->setFlowControl(QSerialPort::NoFlowControl); // 无流控
 
-    // 更新端口
-    updatePortList();
-
-
     /*
     // 设置1ms定时器
     qSerialPortTimer = new QTimer(this);

@@ -23,7 +23,43 @@
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_6"/>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="led">
+       <property name="minimumSize">
+        <size>
+         <width>10</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>led</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
