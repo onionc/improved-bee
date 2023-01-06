@@ -77,6 +77,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(serialPort, &SerialPort::signal_serialPortOpenState, this, &MainWindow::slot_serialPortOpenState); // 串口打开时状态
     connect(serialPort, &SerialPort::signal_serialPortCloseState, this, &MainWindow::slot_serialPortCloseState); // 串口关闭时状态
 
+    // 主线程定时器, 任务调度 10ms
+    runTimer = new QTimer(this);
+    runTimer->setInterval(1000);  //10ms
+    connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
+
+
 
     // 图像相关
     ui->led->setSize(15);
@@ -86,6 +92,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    // 结束子线程
+    serialPortThread->quit();
+    if(serialPortThread->wait(5) == false){
+        serialPortThread->terminate();
+    }
+    delete serialPortThread;
+    delete serialPort;
+
     delete ui;
 }
 
@@ -374,6 +388,8 @@ void MainWindow::slot_serialPortOpenState(bool checked){
 
         ui->openPortBtn->setText("断开串口");
 
+        runTimer->start(); // 任务开始执行
+
     }else{
         enableFrameBtn(true);
         ui->led->setColor(1); // 红色
@@ -389,12 +405,27 @@ void MainWindow::slot_serialPortCloseState(bool checked){
         enableFrameBtn(true);
         ui->led->setColor(0); // 灰色
         ui->openPortBtn->setText("连接串口");
+
+        runTimer->stop(); // 任务停止执行
     }else{
         enableFrameBtn(false);
         ui->led->setColor(2); // 红色
 
         ui->openPortBtn->setChecked(true);
         QMessageBox::critical(this, "失败", "串口关闭失败");
+    }
+
+}
+
+
+// 任务调度：数据处理、绘图
+void MainWindow::slot_taskScheduler(){
+    // 处理数据
+    if(rwLock.tryLockForWrite(3)){
+        qDebug()<<"buf2:"<<serialPort->recvBuf.size();
+        serialPort->recvBuf.remove(1,3);
+
+        rwLock.unlock();
     }
 
 }

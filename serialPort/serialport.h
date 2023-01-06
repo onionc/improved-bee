@@ -8,7 +8,10 @@
 #include <QSerialPortInfo>
 #include <QByteArray>
 #include <QTimer>
+#include <QDebug>
+#include <QReadWriteLock>
 
+extern QReadWriteLock rwLock; // 读写锁
 
 class SerialPort : public QObject
 {
@@ -26,7 +29,7 @@ public:
     void init();
 
 
-private:
+public:
     // 数据缓冲区
     QByteArray recvBuf;
 
@@ -54,6 +57,8 @@ public slots:
     void slot_openSerialPort(QString portName, int baudrate, qint8 dataBits, qint8 stopBits, qint8 parity);
     // 关闭串口
     void slot_closeSerialPort();
+    // 接收数据
+    void slot_recvSerialPortData();
 
 };
 

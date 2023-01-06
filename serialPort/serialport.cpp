@@ -2,25 +2,23 @@
 
 // 串口类
 
-SerialPort::SerialPort(QObject *parent) : QObject(parent){
+QReadWriteLock rwLock; // 读写锁
 
+SerialPort::SerialPort(QObject *parent) : QObject(parent){
+    qSerialPort = new QSerialPort(this);
+    qSerialPort->setFlowControl(QSerialPort::NoFlowControl); // 无流控
 }
 
 SerialPort::~SerialPort(){
-
+    if(qSerialPort && qSerialPort->isOpen()){
+        qSerialPort->close();
+        delete qSerialPort;
+    }
 }
 
 // 初始化串口对象
 void SerialPort::init(){
-    qSerialPort = new QSerialPort(this);
-    qSerialPort->setFlowControl(QSerialPort::NoFlowControl); // 无流控
-
-    /*
-    // 设置1ms定时器
-    qSerialPortTimer = new QTimer(this);
-    qSerialPortTimer->setInterval(1);
-    connect(qSerialPortTimer, &QTimer::timeout, this, xxxx);
-    */
+    connect(qSerialPort, &QSerialPort::readyRead, this, &SerialPort::slot_recvSerialPortData); // 接收数据
 }
 
 // 更新端口列表
@@ -91,3 +89,17 @@ void SerialPort::slot_closeSerialPort(){
         emit signal_serialPortCloseState(true);
     }
 }
+
+// 接收数据
+void SerialPort::slot_recvSerialPortData(){
+    qint64 recvLen = qSerialPort->bytesAvailable();
+    if(recvLen<1) return;
+
+    QByteArray t = qSerialPort->readAll();
+    rwLock.lockForWrite();
+    recvBuf.append(t);
+    rwLock.unlock();
+
+    qDebug()<<"buf:"<<recvBuf.size();
+}
+

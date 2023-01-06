@@ -9,6 +9,7 @@
 #include <QTextCodec>
 #include <QThread>
 #include <QLabel>
+#include <QTimer>
 #include "ui/comboboxdelegate.h"
 #include "ui/tablewidgetdrag.h"
 #include "serialPort/serialport.h"
@@ -44,7 +45,8 @@ private:
     QThread *serialPortThread = nullptr; // 串口线程
     SerialPort* serialPort = nullptr; // 串口对象
 
-
+    // 定时器
+    QTimer *runTimer = nullptr;
 
 private slots:
     // ---- 数据协议 ----
@@ -75,6 +77,9 @@ private slots:
     void slot_serialPortOpenState(bool checked);
     // 串口关闭时的信号变化
     void slot_serialPortCloseState(bool checked);
+
+    // 任务调度：数据处理、绘图
+    void slot_taskScheduler();
 
 signals:
     // 打开串口信号
