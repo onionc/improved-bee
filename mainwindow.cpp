@@ -88,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->led->setSize(15);
     ui->led->setColor(0); // 设定LED为灰色
 
+
 }
 
 MainWindow::~MainWindow()
@@ -214,6 +215,28 @@ void MainWindow::on_addCheckSumBtn_clicked()
     ui->tableWidget->selectRow(curRow);
 }
 
+// 协议格式化，从table获取数据转为vector
+void MainWindow::frameFormat(){
+    frameData.clear();
+    for(int i=0; i<ui->tableWidget->rowCount(); i++) {
+        SProperty info;
+        // 是否选定
+        info.checked = ui->tableWidget->item(i, colName)->checkState()==Qt::Checked;
+
+        // 名称、类型、数据
+        info.name = ui->tableWidget->item(i, colName)->text();
+        info.type = ui->tableWidget->item(i, colType)->text();
+        info.data = ui->tableWidget->item(i, colData)->text();
+
+        // 图表绘图项是否选定
+        info.curve1 = ui->tableWidget->item(i, colCurve1)->checkState()==Qt::Checked;
+        info.curve2 = ui->tableWidget->item(i, colCurve2)->checkState()==Qt::Checked;
+        info.curve3 = ui->tableWidget->item(i, colCurve3)->checkState()==Qt::Checked;
+
+        frameData.push_back(info);
+    }
+}
+
 // 保存协议
 void MainWindow::on_saveFrameBtn_clicked()
 {
@@ -228,24 +251,11 @@ void MainWindow::on_saveFrameBtn_clicked()
         return;
     }
 
+    // 转义数据
+    frameFormat();
+
     // 保存数据到ini文件
-    QSettings write(saveFilename, QSettings::IniFormat);
-    write.setIniCodec(QTextCodec::codecForName("UTF-8"));
-    write.clear();
-    for(int i=0; i<ui->tableWidget->rowCount(); i++) {
-        // 是否选定
-        write.setValue(QString("%1/checked").arg(i), ui->tableWidget->item(i, colName)->checkState()==Qt::Checked?1:0);
-
-        // 名称、类型、数据
-        write.setValue(QString("%1/name").arg(i), ui->tableWidget->item(i, colName)->text());
-        write.setValue(QString("%1/type").arg(i), ui->tableWidget->item(i, colType)->text());
-        write.setValue(QString("%1/data").arg(i), ui->tableWidget->item(i, colData)->text());
-
-        // 图表绘图项是否选定
-        write.setValue(QString("%1/curve1").arg(i), ui->tableWidget->item(i, colCurve1)->checkState()==Qt::Checked);
-        write.setValue(QString("%1/curve2").arg(i), ui->tableWidget->item(i, colCurve2)->checkState()==Qt::Checked);
-        write.setValue(QString("%1/curve3").arg(i), ui->tableWidget->item(i, colCurve3)->checkState()==Qt::Checked);
-    }
+    parse.writeToIni(&frameData, saveFilename);
 }
 
 // 清除表格数据
@@ -273,27 +283,27 @@ void MainWindow::on_loadFrameBtn_clicked()
     // 清除
     clearTable();
 
-    // 打开ini文件
-    QSettings read(loadFilename, QSettings::IniFormat);
-    QStringList allGroups = read.childGroups();
+    // 从ini文件读取协议
+    parse.loadFromIni(loadFilename, &frameData);
+
+    // 显示到table
     QString name, type, data;
     int curRow = ui->tableWidget->rowCount();
-    // 选定状态：行选定（在第一个item下），图1，图2，图3
-    Qt::CheckState line, curve1, curve2, curve3;
-    foreach(QString groupKey, allGroups){
+    Qt::CheckState line, curve1, curve2, curve3; // 选定状态：行选定（在第一个item下），图1，图2，图3
+
+    foreach (SProperty info, frameData) {
+        name = info.name;
+        type = info.type;
+        data = info.data;
+
+        line = info.checked ? Qt::Checked : Qt::Unchecked;
+        curve1 = info.curve1 ? Qt::Checked : Qt::Unchecked;
+        curve2 = info.curve2 ? Qt::Checked : Qt::Unchecked;
+        curve3 = info.curve3 ? Qt::Checked : Qt::Unchecked;
+
+        // 插入一行
         ui->tableWidget->insertRow(curRow);
-
-        name = read.value(QString("%1/name").arg(groupKey)).toString();
-        type = read.value(QString("%1/type").arg(groupKey)).toString();
-        data = read.value(QString("%1/data").arg(groupKey)).toString();
-
-        line = read.value(QString("%1/checked").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
-        curve1 = read.value(QString("%1/curve1").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
-        curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
-        curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool() ? Qt::Checked : Qt::Unchecked;
-
         addRow(curRow, name, type, data, line, curve1, curve2, curve3);
-
         curRow++;
     }
 
@@ -424,6 +434,9 @@ void MainWindow::slot_taskScheduler(){
     if(rwLock.tryLockForWrite(3)){
         qDebug()<<"buf2:"<<serialPort->recvBuf.size();
         serialPort->recvBuf.remove(1,3);
+
+        // 判断帧头
+
 
         rwLock.unlock();
     }

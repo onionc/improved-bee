@@ -34,7 +34,8 @@ SOURCES += \
     serialPort/serialcombox.cpp \
     ui/comboboxdelegate.cpp \
     ui/tablewidgetdrag.cpp \
-    ui/ledlabel.cpp
+    ui/ledlabel.cpp \
+    parse.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -45,7 +46,8 @@ HEADERS += \
     serialPort/serialcombox.h \
     ui/comboboxdelegate.h \
     ui/tablewidgetdrag.h \
-    ui/ledlabel.h
+    ui/ledlabel.h \
+    parse.h
 
 FORMS += \
         mainwindow.ui
