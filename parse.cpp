@@ -56,7 +56,27 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
 
 
 
-// 检查协议
-bool Parse::checkFrame(){
-    return false;
+// 检查协议：查找帧头、校验、帧长
+bool Parse::checkFrame(const QVector<SProperty> *data, QString &errorMsg){
+
+    int itmp = 0;
+    QString tmp;
+    bool ok;
+    errorMsg = "";
+
+
+    for(int i=0; i<data->size(); i++){
+        const SProperty *info = &data->at(i);
+
+        // 帧头
+        if(info->name==FRAME_HEADER){
+            itmp = info->data.toInt(&ok, 16);
+            if(itmp>0xff || !ok){
+                errorMsg = QString("帧头设置错误，错误值：%1").arg(info->data);
+                return false;
+            }
+        }
+    }
+
+    return true;
 }

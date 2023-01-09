@@ -11,6 +11,8 @@
 #include "datatype.h"
 #include <vector>
 #include <QVector>
+#include <QMessageBox>
+#include <QDebug>
 
 class Parse : public QObject
 {
@@ -24,8 +26,8 @@ public:
     // 从ini文件读取
     void loadFromIni(QString readFilename, QVector<SProperty> *data);
 
-    // 检查协议
-    bool checkFrame();
+    // 检查协议：查找帧头、校验、帧长
+    bool checkFrame(const QVector<SProperty> *data, QString &errorMsg);
 };
 
 #endif // PARSE_H

@@ -153,7 +153,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data, Qt
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         item->setFlags(Qt::NoItemFlags);
     }else{
-        item->setCheckState(curve1Checked);
+        item->setCheckState(curve2Checked);
         item->setFlags(item->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
@@ -163,7 +163,7 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data, Qt
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         item->setFlags(Qt::NoItemFlags);
     }else{
-        item->setCheckState(curve1Checked);
+        item->setCheckState(curve3Checked);
         item->setFlags(item->flags()  & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
     }
 
@@ -313,10 +313,22 @@ void MainWindow::on_loadFrameBtn_clicked()
 void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 {
     if(checked){
+
+        // 协议确认
+        frameFormat(); // 协议转结构体
+        QString errorMsg;
+        if(!(parse.checkFrame(&frameData, errorMsg))){
+            QMessageBox::critical(this, "error", errorMsg);
+            return;
+        }
+
+        // 设置界面
         ui->confirmFrameBtn->setText("编辑数据协议");
         // 失能表格；失能按键
         ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         enableFrameBtn(false);
+
+
 
     }else{
         ui->confirmFrameBtn->setText("确认数据协议");
@@ -433,9 +445,6 @@ void MainWindow::slot_taskScheduler(){
     // 处理数据
     if(rwLock.tryLockForWrite(3)){
         qDebug()<<"buf2:"<<serialPort->recvBuf.size();
-        serialPort->recvBuf.remove(1,3);
-
-        // 判断帧头
 
 
         rwLock.unlock();

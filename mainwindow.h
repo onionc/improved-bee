@@ -36,9 +36,6 @@ private:
     void addRow(int curRow, QString name="<name>", QString type="char", QString data="", Qt::CheckState checked=Qt::Checked, Qt::CheckState curve1Checked=Qt::Unchecked, Qt::CheckState curve2Checked=Qt::Unchecked, Qt::CheckState curve3Checked=Qt::Unchecked); // 表格新增一行
 
     // 数据协议
-    const char* FRAME_HEADER = "Frame_Header";
-    const char* FRAME_END = "Frame_Tail"; // 帧尾暂时没用到
-    const char* FRAME_CHECK = "Check_Sum";
     void frameFormat(); // 协议格式化，从table获取数据转为vector
 
     // 串口
