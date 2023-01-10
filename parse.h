@@ -29,8 +29,16 @@ public:
     void loadFromIni(QString readFilename, QVector<SProperty> *data);
 
 
+    // 协议帧信息
+    quint16 frameLen=0; // 帧长度
+    EnumClass::checkSumListEnum frameCheckSumType; // 校验类型
+    QVector<quint8> frameHeaderArr; // 帧头
+    QVector<EnumClass::typeListEnum> frameDataType; // 数据类型
+    QVector<QString> frameDataName; // 数据名称
+
     // 协议帧信息解析：查找帧头、校验、帧长
     bool parseFrame(const QVector<SProperty> *data, QString &errorMsg);
+
 };
 
 #endif // PARSE_H

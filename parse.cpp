@@ -66,10 +66,6 @@ bool Parse::parseFrame(const QVector<SProperty> *data, QString &errorMsg){
     errorMsg = "";
 
 
-    // 协议帧信息
-    QVector<quint8> frameHeaderArr; // 帧头
-    EnumClass::checkSumListEnum frameCheckSumType; // 校验类型
-    quint16 frameLen=0; // 帧长度
 
 
     if(data->size()<=0){
@@ -124,6 +120,40 @@ bool Parse::parseFrame(const QVector<SProperty> *data, QString &errorMsg){
             }
 
         }else{ // 数据
+            // 数据名称
+            frameDataName.push_back(info->name);
+
+            // 数据类型
+            EnumClass::typeListEnum type = str2Type(info->type);
+            frameDataType.append(type);
+            switch(type){
+                case EnumClass::t_char:
+                    frameLen++;
+                    break;
+                case EnumClass::t_uchar:
+                    frameLen++;
+                    break;
+                case EnumClass::t_short:
+                    frameLen+=2;
+                    break;
+                case EnumClass::t_ushort:
+                    frameLen+=2;
+                    break;
+                case EnumClass::t_int:
+                    frameLen+=4;
+                    break;
+                case EnumClass::t_uint:
+                    frameLen+=4;
+                    break;
+                case EnumClass::t_float:
+                    frameLen+=4;
+                    break;
+                case EnumClass::t_double:
+                    frameLen+=8;
+                default:
+                    break;
+            }
+
 
         }
 

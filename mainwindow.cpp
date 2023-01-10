@@ -88,7 +88,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->led->setSize(15);
     ui->led->setColor(0); // 设定LED为灰色
 
-
+    // 协议未确认
+    frameChecked = false;
 }
 
 MainWindow::~MainWindow()
@@ -346,12 +347,16 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         enableFrameBtn(false);
 
+        frameChecked = true;
+
     }else{
         ui->confirmFrameBtn->setText("确认数据协议");
+
         // 使能表格；使能按键
         enableFrameBtn(true);
         ui->tableWidget->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 
+        frameChecked = false;
     }
 }
 
@@ -375,6 +380,12 @@ void MainWindow::on_openPortBtn_clicked(bool checked)
 
     if(checked){
         // 打开串口
+
+        // 判断是否确认数据帧
+        if(!frameChecked){
+            QMessageBox::critical(this, "error", "请先确认数据协议");
+            return;
+        }
 
         // 串口名称，波特率，数据位，停止位，校验
         QString name     = ui->comPort_comboBox->currentText();

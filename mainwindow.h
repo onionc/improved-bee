@@ -38,6 +38,7 @@ private:
 
     // 数据协议
     void frameFormat(); // 协议格式化，从table获取数据转为vector
+    bool frameChecked; // 数据协议确认
 
     // 串口
     bool isOpenSerialPort; // 串口是否打开
