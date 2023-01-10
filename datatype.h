@@ -6,33 +6,58 @@
 #include <QStringList>
 #include <QMap>
 #include <QString>
+#include <QMetaEnum>
+#include <QObject>
+#include <QtCore>
 
-// 数据类型字符串
-extern const QStringList typeList;
+// 通过枚举类型获取字符串
+#define typeS(a) DATA::typeListStr(a)
+#define checkS(a) DATA::checkSumListStr(a)
 
-// 特殊数据名称
-#define FRAME_HEADER "Frame_Header"
-#define FRAME_END "Frame_Tail" // 帧尾暂时没用到
-#define FRAME_CHECK "Check_Sum"
-
-// 协议字段
-enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
-// 每一项（属性）的结构体
-typedef struct SProperty_Struct{
-    QString name;
-    QString type;
-    QString data;
-    bool checked;
-    bool curve1;
-    bool curve2;
-    bool curve3;
-}SProperty;
+namespace DATA{
 
 
-class DataType
-{
-public:
-    DataType();
-};
+    class EnumClass{
+        Q_GADGET
+    public:
+        // 数据类型列表
+        enum typeListEnum{t_char=0, t_uchar, t_short, t_ushort, t_int, t_uint, t_float, t_double};
+        Q_ENUM(typeListEnum)
+
+        // 校验类型列表
+        enum checkSumListEnum{c_add8=0, c_xor8, c_Crc_CcittXmodem};
+        Q_ENUM(checkSumListEnum)
+
+    };
+    const extern QStringList typeList;
+    const extern QStringList checkSumList;
+    // 枚举转字符串
+    QString type2Str(EnumClass::typeListEnum type);
+    QString checkSum2Str(EnumClass::checkSumListEnum checkType);
+    // 字符串转枚举
+    EnumClass::typeListEnum str2Type(QString typeStr);
+    EnumClass::checkSumListEnum str2CheckSum(QString checkTypeStr);
+
+
+
+    // 特殊数据名称
+    extern const char* FRAME_HEADER;
+    extern const char* FRAME_END; // 帧尾暂时没用到
+    extern const char* FRAME_CHECK;
+
+    // 协议字段
+    enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
+    // 每一项（属性）的结构体
+    typedef struct SProperty_Struct{
+        QString name;
+        QString type;
+        QString data;
+        bool checked;
+        bool curve1;
+        bool curve2;
+        bool curve3;
+    }SProperty;
+
+}
 
 #endif // DATATYPE_H

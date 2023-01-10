@@ -106,7 +106,7 @@ MainWindow::~MainWindow()
 
 
 // 表格新增一行
-void MainWindow::addRow(int curRow, QString name, QString type, QString data, Qt::CheckState checked, Qt::CheckState curve1Checked, Qt::CheckState curve2Checked, Qt::CheckState curve3Checked){
+void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, QString data, Qt::CheckState checked, Qt::CheckState curve1Checked, Qt::CheckState curve2Checked, Qt::CheckState curve3Checked){
     QTableWidgetItem *item;
 
     int typeValue = 1000; // type>=1000 自定义类型
@@ -123,7 +123,9 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data, Qt
     }
 
     // 数据类型
-    item = new QTableWidgetItem(type, typeValue++);
+
+    QString typeStr = typeList[type];
+    item = new QTableWidgetItem(typeStr, typeValue++);
     ui->tableWidget->setItem(curRow, colType, item);
     if(name == FRAME_HEADER || name == FRAME_END){
         // 特殊项类型不可编辑
@@ -132,8 +134,15 @@ void MainWindow::addRow(int curRow, QString name, QString type, QString data, Qt
 
 
     // 数据
-    item = new QTableWidgetItem(data, typeValue++);
-    ui->tableWidget->setItem(curRow, colData, item);
+    if(name == FRAME_CHECK){
+        QComboBox *classBox = new QComboBox;
+        classBox->addItems(checkSumList);
+        classBox->setCurrentText(data);
+        ui->tableWidget->setCellWidget(curRow, colData, classBox);
+    }else{
+        item = new QTableWidgetItem(data, typeValue++);
+        ui->tableWidget->setItem(curRow, colData, item);
+    }
 
     // 绘图1
     item = new QTableWidgetItem("", typeValue++);
@@ -197,7 +206,7 @@ void MainWindow::on_addHeaderBtn_clicked()
     int curRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(curRow);
 
-    addRow(curRow, FRAME_HEADER, "uchar", "0xAA");
+    addRow(curRow, FRAME_HEADER, EnumClass::t_char, "0xAA");
 
     // 选定新行
     ui->tableWidget->selectRow(curRow);
@@ -209,7 +218,7 @@ void MainWindow::on_addCheckSumBtn_clicked()
     int curRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(curRow);
 
-    addRow(curRow, FRAME_CHECK, "uchar", "");
+    addRow(curRow, FRAME_CHECK, EnumClass::t_uchar, "");
 
     // 选定新行
     ui->tableWidget->selectRow(curRow);
@@ -224,9 +233,16 @@ void MainWindow::frameFormat(){
         info.checked = ui->tableWidget->item(i, colName)->checkState()==Qt::Checked;
 
         // 名称、类型、数据
+
         info.name = ui->tableWidget->item(i, colName)->text();
         info.type = ui->tableWidget->item(i, colType)->text();
-        info.data = ui->tableWidget->item(i, colData)->text();
+        if(info.name==FRAME_CHECK){
+            // 校验通过checkbox获取数据
+            QComboBox *box = static_cast<QComboBox*>(ui->tableWidget->cellWidget(i, colData));
+            info.data = box->currentText();
+        }else{
+            info.data = ui->tableWidget->item(i, colData)->text();
+        }
 
         // 图表绘图项是否选定
         info.curve1 = ui->tableWidget->item(i, colCurve1)->checkState()==Qt::Checked;
@@ -287,13 +303,14 @@ void MainWindow::on_loadFrameBtn_clicked()
     parse.loadFromIni(loadFilename, &frameData);
 
     // 显示到table
-    QString name, type, data;
+    QString name, data;
     int curRow = ui->tableWidget->rowCount();
     Qt::CheckState line, curve1, curve2, curve3; // 选定状态：行选定（在第一个item下），图1，图2，图3
+    EnumClass::typeListEnum type;
 
     foreach (SProperty info, frameData) {
         name = info.name;
-        type = info.type;
+        type = DATA::str2Type(info.type);
         data = info.data;
 
         line = info.checked ? Qt::Checked : Qt::Unchecked;
@@ -317,7 +334,8 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 协议确认
         frameFormat(); // 协议转结构体
         QString errorMsg;
-        if(!(parse.checkFrame(&frameData, errorMsg))){
+        if(!(parse.parseFrame(&frameData, errorMsg))){
+            ui->confirmFrameBtn->setChecked(false);
             QMessageBox::critical(this, "error", errorMsg);
             return;
         }
@@ -327,8 +345,6 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 失能表格；失能按键
         ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         enableFrameBtn(false);
-
-
 
     }else{
         ui->confirmFrameBtn->setText("确认数据协议");

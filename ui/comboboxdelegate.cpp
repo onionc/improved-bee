@@ -11,7 +11,7 @@ QWidget *ComboboxDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
     classBox->setFrame(false);
     classBox->setEditable(false);
 
-    classBox->addItems(typeList);
+    classBox->addItems(DATA::typeList);
     classBox->setCurrentIndex(0);
     classBox->setStyleSheet("font-size:16px;");
     return classBox;
@@ -30,6 +30,7 @@ void ComboboxDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 void ComboboxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
     QComboBox *box = static_cast<QComboBox*>(editor);
     QString str = box->currentText();
+
     model->setData(index, str, Qt::EditRole);
     model->setProperty("font", 20);
 }

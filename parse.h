@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include <QDebug>
 
+using namespace DATA;
+
 class Parse : public QObject
 {
     Q_OBJECT
@@ -26,8 +28,9 @@ public:
     // 从ini文件读取
     void loadFromIni(QString readFilename, QVector<SProperty> *data);
 
-    // 检查协议：查找帧头、校验、帧长
-    bool checkFrame(const QVector<SProperty> *data, QString &errorMsg);
+
+    // 协议帧信息解析：查找帧头、校验、帧长
+    bool parseFrame(const QVector<SProperty> *data, QString &errorMsg);
 };
 
 #endif // PARSE_H
