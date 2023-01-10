@@ -470,11 +470,17 @@ void MainWindow::slot_serialPortCloseState(bool checked){
 // 任务调度：数据处理、绘图
 void MainWindow::slot_taskScheduler(){
     // 处理数据
+
     if(rwLock.tryLockForWrite(3)){
         qDebug()<<"buf2:"<<serialPort->recvBuf.size();
-
-
+        recvBuf += serialPort->recvBuf;
+        serialPort->recvBuf.clear();
         rwLock.unlock();
+    }
+
+    // 解析数据
+    while(serialPort->recvBuf.size()>parse.frameLen){
+        parse.parseFrameByte(serialPort->recvBuf);
     }
 
 }

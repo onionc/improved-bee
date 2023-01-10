@@ -57,7 +57,7 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
 
 
 // 协议帧信息解析：查找帧头、校验、帧长
-bool Parse::parseFrame(const QVector<SProperty> *data, QString &errorMsg){
+bool Parse::parseFrame(const QVector<SProperty> *frameInfoData, QString &errorMsg){
 
     int itmp = 0;
     quint8 byte;
@@ -67,15 +67,14 @@ bool Parse::parseFrame(const QVector<SProperty> *data, QString &errorMsg){
 
 
 
-
-    if(data->size()<=0){
+    if(frameInfoData->size()<=0){
         errorMsg = QString("帧协议为空");
         return false;
     }
 
     QString lastName = "";
-    for(int i=0; i<data->size(); i++){
-        const SProperty *info = &data->at(i);
+    for(int i=0; i<frameInfoData->size(); i++){
+        const SProperty *info = &frameInfoData->at(i);
 
         /* 帧头校验的限制性说明
          * 1. 帧头必须有；帧头只能位于开头；可以有多个字节（因为帧头按字节一项项存，所以有多项）；
@@ -90,7 +89,7 @@ bool Parse::parseFrame(const QVector<SProperty> *data, QString &errorMsg){
             errorMsg = QString("多个帧头必须连续，且都放到开头处");
             return false;
         }
-        if(info->name==FRAME_CHECK && i!=data->size()-1){
+        if(info->name==FRAME_CHECK && i!=frameInfoData->size()-1){
             errorMsg = QString("检验和只能有一项，且必须位于结尾处");
             return false;
         }
@@ -159,6 +158,53 @@ bool Parse::parseFrame(const QVector<SProperty> *data, QString &errorMsg){
 
         lastName = info->name;
     }
+
+    frameHeaderSize = frameHeaderArr.size();
+    frameDataSize = frameDataType.size();
+
+    if(frameHeaderSize<=0 || frameDataSize<=0){
+        errorMsg = QString("必须有帧头和数据");
+        return false;
+    }
+
+    return true;
+}
+
+
+// 解析一帧数据：判断帧头、检验和，找出一帧数据的字节数组
+bool Parse::parseFrameByte(QByteArray &allBytes){
+    if(allBytes.size()<frameLen){
+        return false;
+    }
+
+    bool frameHeaderOk = false;
+    QVector<quint8> t;
+qFind(t.begin(), t.end(), 0x55);
+
+    int i, j=0;
+    // 找帧头的第一个字节
+    i = allBytes.indexOf(frameHeaderArr);
+    if(i<0){
+        // 未找到完整帧头，继续查看末尾是否有部分帧头
+        while(++j<frameHeaderArr.size()){
+            // 继续找
+            i = allBytes.indexOf(frameHeaderArr.mid(0, frameHeaderSize-1));
+            if(i>=0){
+                allBytes.remove(0, i-1);
+                return false;
+            }
+        }
+        allBytes.clear();
+        return false;
+    }
+
+
+    // 剩余长度是否足够
+
+    // 判断校验和
+
+
+
 
     return true;
 }

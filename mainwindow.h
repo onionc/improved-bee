@@ -51,6 +51,7 @@ private:
     // 解析
     Parse parse;
     QVector<SProperty> frameData; // 协议
+    QByteArray recvBuf; // 接收的字节数据
 
 private slots:
     // ---- 数据协议 ----
