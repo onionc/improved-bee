@@ -28,7 +28,13 @@ void TableWidgetDrag::dropEvent(QDropEvent *event){
     }
     // 执行移动 并移除原行
     for(int i = 0;i < this->columnCount();i++){            // 遍历列
-        this->setItem(row_dst,i,this->takeItem(row_src,i));// 每一列item的移动
+        QTableWidgetItem *t = this->takeItem(row_src,i);
+        if(t){
+            this->setItem(row_dst,i,t);// 每一列item的移动
+        }else{
+            // 有部分数据是widget类型的，比如QCombobox的，需要如此赋值
+            this->setCellWidget(row_dst, i, this->cellWidget(row_src,i));
+        }
     }
 
     this->removeRow(row_src); // 删除原行
