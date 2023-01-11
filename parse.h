@@ -46,6 +46,11 @@ public:
     bool parseFrameByte(QByteArray &allBytes);
 
 
+
+    // 协议
+    // CRC16 协议解析 (CCITT-Xmodem)
+    unsigned short Crc16Xmode(char *q, int len);
+
 private:
     // 校验数据，frameBytes 为一帧数据
     bool checkData(const QByteArray &frameBytes);

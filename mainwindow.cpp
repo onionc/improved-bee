@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 主线程定时器, 任务调度 10ms
     runTimer = new QTimer(this);
-    runTimer->setInterval(5000);  //10ms
+    runTimer->setInterval(3000);  //10ms
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
 
