@@ -107,6 +107,9 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
         }else if(info->name==FRAME_CHECK){ // 校验信息
             frameCheckSumType = str2CheckSum(info->data);
             switch(frameCheckSumType){
+                case EnumClass::None:
+                    // 不做具体校验，只是为了有默认值
+                    break;
                 case EnumClass::c_add8:
                     frameLen++;
                     break;
@@ -191,7 +194,7 @@ bool Parse::parseFrameByte(QByteArray &allBytes){
     if(startIndex<0){
         // 未找到完整帧头，继续查看末尾是否有部分帧头
         int j=0;
-        while(++j<frameHeaderArr.size()){
+        while(++j<frameHeaderSize){
             // 继续找
             t = allBytes.mid(dataIndex);
             startIndex = t.indexOf(frameHeaderArr.mid(0, frameHeaderSize-j));
@@ -231,6 +234,8 @@ bool Parse::parseFrameByte(QByteArray &allBytes){
     // 检验数据，暂时默认从帧头后到校验数据之间的数据
     if(frameCheckSumType!=EnumClass::None){
         if(!checkData(allBytes.mid(startIndex, frameLen))){
+            qDebug()<<"check failed";
+            allBytes.remove(0, startIndex+frameHeaderSize); // 清除帧头数据
             return false;
         }
     }
@@ -248,16 +253,30 @@ bool Parse::parseFrameByte(QByteArray &allBytes){
 // 校验数据
 bool Parse::checkData(const QByteArray &frameBytes){
 
+    int size = frameBytes.size();
+    if(size!=frameLen){
+        return false;
+    }
 
+    quint8 result[4]={0x00}, r[4]={0x00};
     switch(frameCheckSumType){
         case EnumClass::c_add8:
-        break;
+            result[0] = frameBytes.at(frameLen-1);
+            for(int i=frameHeaderSize; i<size-1; i++){
+                r[0]+=(quint8)frameBytes[i];
+            };
+            if(r[0] == result[0]){
+                return true;
+            }
+            break;
         case EnumClass::c_xor8:
-        break;
+            result[0] = frameBytes.at(frameLen-1);
+            break;
         case EnumClass::c_crc16_xmodem:
-        break;
+            //frameBytes.mid(frameLen-2, 1);
+            break;
         default:
-        break;
+            break;
     }
-    return true;
+    return false;
 }

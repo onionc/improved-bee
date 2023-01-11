@@ -126,9 +126,12 @@ void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, 
     // 数据类型
 
     QString typeStr = typeList[type];
+    if(name == FRAME_CHECK){
+        typeStr = "--"; // 校验无数据类型，长度通过具体校验类型确认
+    }
     item = new QTableWidgetItem(typeStr, typeValue++);
     ui->tableWidget->setItem(curRow, colType, item);
-    if(name == FRAME_HEADER || name == FRAME_END){
+    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         // 特殊项类型不可编辑
         item->setFlags(item->flags() & (~Qt::ItemIsEditable));
     }
@@ -207,7 +210,7 @@ void MainWindow::on_addHeaderBtn_clicked()
     int curRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(curRow);
 
-    addRow(curRow, FRAME_HEADER, EnumClass::t_char, "0xAA");
+    addRow(curRow, FRAME_HEADER, EnumClass::t_uchar, "0xAA");
 
     // 选定新行
     ui->tableWidget->selectRow(curRow);
@@ -484,6 +487,7 @@ void MainWindow::slot_taskScheduler(){
 
     // 解析数据
     qDebug()<<"buf before:"<<recvBuf.size();
+    qDebug()<<"parse.frame:"<<parse.frameLen;
     while(recvBuf.size()>=parse.frameLen){
         parse.parseFrameByte(recvBuf);
     }

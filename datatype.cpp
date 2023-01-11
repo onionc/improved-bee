@@ -25,7 +25,6 @@ const QStringList DATA::checkSumList = [](){
     QStringList t;
 
     for(int i=0; i<meta.keyCount(); i++){
-        if(QString(meta.key(i))=="None") continue; // None为特殊值，在显示时不需要选择
         t<<QString(meta.key(i));
     }
 
