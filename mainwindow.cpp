@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 主线程定时器, 任务调度 10ms
     runTimer = new QTimer(this);
-    runTimer->setInterval(1000);  //10ms
+    runTimer->setInterval(5000);  //10ms
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
 
@@ -335,7 +335,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 协议确认
         frameFormat(); // 协议转结构体
         QString errorMsg;
-        if(!(parse.parseFrame(&frameData, errorMsg))){
+        if(!(parse.parseFrameInfo(&frameData, errorMsg))){
             ui->confirmFrameBtn->setChecked(false);
             QMessageBox::critical(this, "error", errorMsg);
             return;
@@ -384,6 +384,7 @@ void MainWindow::on_openPortBtn_clicked(bool checked)
         // 判断是否确认数据帧
         if(!frameChecked){
             QMessageBox::critical(this, "error", "请先确认数据协议");
+            ui->openPortBtn->setChecked(false);
             return;
         }
 
@@ -432,18 +433,20 @@ void MainWindow::on_openPortBtn_clicked(bool checked)
 // 串口打开时的信号变化
 void MainWindow::slot_serialPortOpenState(bool checked){
     if(checked){
-        enableFrameBtn(false); // 失能协议编辑按钮
-        ui->led->setColor(2); // 点亮led（绿色）
+        ui->confirmFrameBtn->setEnabled(false); // 失能编辑协议按钮
 
+        ui->led->setColor(2); // 点亮led（绿色）
         ui->openPortBtn->setText("断开串口");
 
+        recvBuf.clear(); // 清除临时存储的数据
         runTimer->start(); // 任务开始执行
 
     }else{
-        enableFrameBtn(true);
-        ui->led->setColor(1); // 红色
+        ui->confirmFrameBtn->setEnabled(true);
 
+        ui->led->setColor(1); // 红色
         ui->openPortBtn->setChecked(false);
+
         QMessageBox::critical(this, "失败", "串口打开失败");
     }
 }
@@ -451,16 +454,18 @@ void MainWindow::slot_serialPortOpenState(bool checked){
 // 串口关闭时的信号变化
 void MainWindow::slot_serialPortCloseState(bool checked){
     if(checked){
-        enableFrameBtn(true);
+        ui->confirmFrameBtn->setEnabled(true);
+
         ui->led->setColor(0); // 灰色
         ui->openPortBtn->setText("连接串口");
 
         runTimer->stop(); // 任务停止执行
     }else{
-        enableFrameBtn(false);
-        ui->led->setColor(2); // 红色
+        ui->confirmFrameBtn->setEnabled(false);
 
+        ui->led->setColor(2); // 红色
         ui->openPortBtn->setChecked(true);
+
         QMessageBox::critical(this, "失败", "串口关闭失败");
     }
 
@@ -472,15 +477,16 @@ void MainWindow::slot_taskScheduler(){
     // 处理数据
 
     if(rwLock.tryLockForWrite(3)){
-        qDebug()<<"buf2:"<<serialPort->recvBuf.size();
         recvBuf += serialPort->recvBuf;
         serialPort->recvBuf.clear();
         rwLock.unlock();
     }
 
     // 解析数据
-    while(serialPort->recvBuf.size()>parse.frameLen){
-        parse.parseFrameByte(serialPort->recvBuf);
+    qDebug()<<"buf before:"<<recvBuf.size();
+    while(recvBuf.size()>=parse.frameLen){
+        parse.parseFrameByte(recvBuf);
     }
+    qDebug()<<"buf after:"<<recvBuf.size();
 
 }

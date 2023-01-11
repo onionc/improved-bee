@@ -57,7 +57,7 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
 
 
 // 协议帧信息解析：查找帧头、校验、帧长
-bool Parse::parseFrame(const QVector<SProperty> *frameInfoData, QString &errorMsg){
+bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg){
 
     int itmp = 0;
     quint8 byte;
@@ -104,7 +104,7 @@ bool Parse::parseFrame(const QVector<SProperty> *frameInfoData, QString &errorMs
             }
             frameHeaderArr.push_back((quint8)itmp);
             frameLen++;
-        }else if(info->name==FRAME_CHECK){ // 校验字节
+        }else if(info->name==FRAME_CHECK){ // 校验信息
             frameCheckSumType = str2CheckSum(info->data);
             switch(frameCheckSumType){
                 case EnumClass::c_add8:
@@ -113,9 +113,12 @@ bool Parse::parseFrame(const QVector<SProperty> *frameInfoData, QString &errorMs
                 case EnumClass::c_xor8:
                     frameLen++;
                     break;
-                case EnumClass::c_Crc_CcittXmodem:
+                case EnumClass::c_crc16_xmodem:
                     frameLen+=2;
                     break;
+                default:
+                    errorMsg = QString("校验类型设置错误");
+                    return false;
             }
 
         }else{ // 数据
@@ -171,40 +174,90 @@ bool Parse::parseFrame(const QVector<SProperty> *frameInfoData, QString &errorMs
 }
 
 
-// 解析一帧数据：判断帧头、检验和，找出一帧数据的字节数组
+// 解析一帧数据
 bool Parse::parseFrameByte(QByteArray &allBytes){
     if(allBytes.size()<frameLen){
         return false;
     }
 
     bool frameHeaderOk = false;
-    QVector<quint8> t;
-qFind(t.begin(), t.end(), 0x55);
 
-    int i, j=0;
+    int startIndex=-1; // 帧头索引
+    int dataIndex=0; // 数据头索引，默认为0，检查allBytes,特殊情况下，设置其他值
+    //qDebug()<<allBytes;
     // 找帧头的第一个字节
-    i = allBytes.indexOf(frameHeaderArr);
-    if(i<0){
+    startIndex = allBytes.indexOf(frameHeaderArr);
+    QByteArray t;
+    if(startIndex<0){
         // 未找到完整帧头，继续查看末尾是否有部分帧头
+        int j=0;
         while(++j<frameHeaderArr.size()){
             // 继续找
-            i = allBytes.indexOf(frameHeaderArr.mid(0, frameHeaderSize-1));
-            if(i>=0){
-                allBytes.remove(0, i-1);
-                return false;
+            t = allBytes.mid(dataIndex);
+            startIndex = t.indexOf(frameHeaderArr.mid(0, frameHeaderSize-j));
+
+            if(startIndex>=0){
+                // 找到子串
+
+                if(startIndex+(frameHeaderSize-j)==t.size()){
+                    // 并且在末尾
+                    allBytes.remove(0, startIndex+dataIndex); // 清除 部分帧头 之前的数据
+                    return false;
+                }else{
+                    /*
+                     * 找到子串，但是不在末尾。其实还需要再在startIndex后面的子串中查找子串
+                     * 比如在协议头 AA BB xx xx xx 下有数据 0x 11 22 33 AA AA ，应该保留数据的最后一个AA
+                     *
+                     */
+                    dataIndex = startIndex+1;
+                    j--; // 需要重新查同样的子串，撤回一个字节
+                }
             }
+
         }
         allBytes.clear();
         return false;
     }
 
 
+
     // 剩余长度是否足够
+    if((allBytes.size()-startIndex) < frameLen){
+        qDebug()<<allBytes.size()<<"-"<<startIndex<<"<"<<frameLen;
+        allBytes.remove(0, startIndex); // 清除帧头之前的数据
+        return false;
+    }
 
-    // 判断校验和
+    // 检验数据，暂时默认从帧头后到校验数据之间的数据
+    if(frameCheckSumType!=EnumClass::None){
+        if(!checkData(allBytes.mid(startIndex, frameLen))){
+            return false;
+        }
+    }
+
+    // todo 解析数据
+    qDebug()<<"end"<<startIndex<<" "<<startIndex+frameLen;
+    allBytes.remove(0, startIndex+frameLen);
 
 
 
+    return true;
+}
 
+
+// 校验数据
+bool Parse::checkData(const QByteArray &frameBytes){
+
+
+    switch(frameCheckSumType){
+        case EnumClass::c_add8:
+        break;
+        case EnumClass::c_xor8:
+        break;
+        case EnumClass::c_crc16_xmodem:
+        break;
+        default:
+        break;
+    }
     return true;
 }

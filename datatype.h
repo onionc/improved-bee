@@ -25,7 +25,7 @@ namespace DATA{
         Q_ENUM(typeListEnum)
 
         // 校验类型列表
-        enum checkSumListEnum{c_add8=0, c_xor8, c_Crc_CcittXmodem};
+        enum checkSumListEnum{None=0, c_add8, c_xor8, c_crc16_xmodem};
         Q_ENUM(checkSumListEnum)
 
     };

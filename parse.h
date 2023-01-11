@@ -31,7 +31,7 @@ public:
 
     // 协议帧信息
     quint16 frameLen=0; // 帧长度
-    EnumClass::checkSumListEnum frameCheckSumType; // 校验类型
+    EnumClass::checkSumListEnum frameCheckSumType=EnumClass::None; // 校验类型
     QByteArray frameHeaderArr; // 帧头
     QVector<EnumClass::typeListEnum> frameDataType; // 数据类型
     QVector<QString> frameDataName; // 数据名称
@@ -40,13 +40,19 @@ public:
 
 
     // 协议帧信息解析：查找帧头、校验、帧长
-    bool parseFrame(const QVector<SProperty> *frameInfoData, QString &errorMsg);
+    bool parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg);
 
-    // 解析一帧数据：判断帧头、检验和，找出一帧数据的字节数组
+    // 从字节数据中解析一帧数据：判断帧头、检验和，每次找出一帧数据
     bool parseFrameByte(QByteArray &allBytes);
 
-    // 解析帧信息：拿帧字节和协议解析数据
-    bool parseFrameData(QByteArray &dataBytes);
+
+private:
+    // 校验数据，frameBytes 为一帧数据
+    bool checkData(const QByteArray &frameBytes);
+
+    // 解析帧信息：拿帧字节和协议解析数据，frameBytes 为一帧数据
+    bool parseFrameData(const QByteArray &frameBytes);
+
 
 
 };
