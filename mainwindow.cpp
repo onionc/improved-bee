@@ -31,6 +31,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
+    // 显示数据的表格
+    showTableWidget = new QTableWidget();
+    showTableWidget->setObjectName("tableWidget2");
+    ui->verticalLayout_2->addWidget(showTableWidget);
+    switchTable(true); // 显示编辑框
+
     // toolBox控制界面设置
     ui->panelBox->setCurrentIndex(0); // 默认第一页
 
@@ -353,6 +359,9 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 失能按钮
         enableFrameBtn(false);
 
+        // 切换表格
+        switchTable(false);
+
         frameChecked = true;
 
     }else{
@@ -365,7 +374,21 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 使能按钮
         enableFrameBtn(true);
 
+        // 切换表格
+        switchTable(true);
+
         frameChecked = false;
+    }
+}
+
+// 切换表格的显示
+void MainWindow::switchTable(bool formatPage){
+    if(formatPage){
+        ui->tableWidget->show();
+        showTableWidget->hide();
+    }else{
+        ui->tableWidget->hide();
+        showTableWidget->show();
     }
 }
 

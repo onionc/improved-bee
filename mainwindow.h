@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QVector>
 #include <QComboBox>
+#include <QTableWidget>
 #include "ui/comboboxdelegate.h"
 #include "ui/tablewidgetdrag.h"
 #include "serialPort/serialport.h"
@@ -31,10 +32,13 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QTableWidget  *showTableWidget;
 
     // 表格
     ComboboxDelegate comboboxDelegate; // // 下拉框代理
     void addRow(int curRow, QString name="<name>", EnumClass::typeListEnum type=EnumClass::t_char, QString data="", Qt::CheckState checked=Qt::Checked, Qt::CheckState curve1Checked=Qt::Unchecked, Qt::CheckState curve2Checked=Qt::Unchecked, Qt::CheckState curve3Checked=Qt::Unchecked); // 表格新增一行
+
+    void switchTable(bool formatPage=true); // 切换表格的显示, framePage=true 显示协议编辑框，=false显示数据框
 
     // 数据协议
     void frameFormat(); // 协议格式化，从table获取数据转为vector
