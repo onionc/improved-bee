@@ -346,8 +346,11 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
         // 设置界面
         ui->confirmFrameBtn->setText("编辑数据协议");
-        // 失能表格；失能按键
-        ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        // 失能表格
+        ui->tableWidget->setEnabled(false);
+        //ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+        // 失能按钮
         enableFrameBtn(false);
 
         frameChecked = true;
@@ -355,9 +358,12 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
     }else{
         ui->confirmFrameBtn->setText("确认数据协议");
 
-        // 使能表格；使能按键
+        // 使能表格
+        ui->tableWidget->setEnabled(true);
+        //ui->tableWidget->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
+
+        // 使能按钮
         enableFrameBtn(true);
-        ui->tableWidget->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 
         frameChecked = false;
     }
@@ -487,9 +493,9 @@ void MainWindow::slot_taskScheduler(){
 
     // 解析数据
     qDebug()<<"buf before:"<<recvBuf.size();
-    qDebug()<<"parse.frame:"<<parse.frameLen;
-    while(recvBuf.size()>=parse.frameLen){
-        parse.parseFrameByte(recvBuf);
+    qDebug()<<"parse.frame:"<<parse.getFrameLen();
+    while(recvBuf.size()>=parse.getFrameLen()){
+        parse.findFrameAndParse(recvBuf);
     }
     qDebug()<<"buf after:"<<recvBuf.size();
 

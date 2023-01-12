@@ -47,7 +47,7 @@ namespace DATA{
 
     // 协议字段
     enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
-    // 每一项（属性）的结构体
+    // 协议信息 每一项（属性）的结构体
     typedef struct SProperty_Struct{
         QString name;
         QString type;
@@ -57,6 +57,13 @@ namespace DATA{
         bool curve2;
         bool curve3;
     }SProperty;
+    // 数据 每一项的结构体
+    typedef struct NAV_Data_Struct{
+        QString name; // 名称
+        EnumClass::typeListEnum type; // 类型
+        quint8 bytesLen; // 类型对应的数据长度
+        QByteArray buf; // 数组
+    }NAV_Data;
 
 }
 

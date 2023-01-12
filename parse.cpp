@@ -36,6 +36,7 @@ void Parse::writeToIni(const QVector<SProperty> *data, QString saveFilename){
 // 从ini文件读取
 void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
     // 打开ini文件
+    data->clear();
     QSettings read(readFilename, QSettings::IniFormat);
     QStringList allGroups = read.childGroups();
     data->clear();
@@ -60,12 +61,9 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
 bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg){
 
     int itmp = 0;
-    quint8 byte;
     QString tmp;
     bool ok;
     errorMsg = "";
-
-
 
     if(frameInfoData->size()<=0){
         errorMsg = QString("帧协议为空");
@@ -73,13 +71,10 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
     }
 
     // 初始化帧信息
-    frameLen = 0;
+    frameLen = frameHeaderLen = frameDataLen = frameCheckLen = 0;
     frameCheckSumType = EnumClass::None;
     frameHeaderArr.clear();
-    frameHeaderSize = 0;
-    frameDataType.clear();
-    frameDataName.clear();
-    frameDataSize = 0;
+    frameDataArr.clear();
 
     QString lastName = "";
     for(int i=0; i<frameInfoData->size(); i++){
@@ -112,7 +107,6 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                 return false;
             }
             frameHeaderArr.push_back((quint8)itmp);
-            frameLen++;
         }else if(info->name==FRAME_CHECK){ // 校验信息
             frameCheckSumType = str2CheckSum(info->data);
             switch(frameCheckSumType){
@@ -120,13 +114,13 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                     // 不做具体校验，只是为了有默认值
                     break;
                 case EnumClass::c_add8:
-                    frameLen++;
+                    frameCheckLen = 1;
                     break;
                 case EnumClass::c_xor8:
-                    frameLen++;
+                    frameCheckLen = 1;
                     break;
                 case EnumClass::c_crc16_xmodem:
-                    frameLen+=2;
+                    frameCheckLen = 2;
                     break;
                 default:
                     errorMsg = QString("校验类型设置错误");
@@ -134,50 +128,60 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
             }
 
         }else{ // 数据
+            NAV_Data nav;
             // 数据名称
-            frameDataName.push_back(info->name);
+            nav.name = info->name;
 
             // 数据类型
             EnumClass::typeListEnum type = str2Type(info->type);
-            frameDataType.append(type);
+            nav.type = type;
+
             switch(type){
                 case EnumClass::t_char:
-                    frameLen++;
+                    frameDataLen++;
+                    nav.bytesLen = 1;
                     break;
                 case EnumClass::t_uchar:
-                    frameLen++;
+                    frameDataLen++;
+                    nav.bytesLen = 1;
                     break;
                 case EnumClass::t_short:
-                    frameLen+=2;
+                    frameDataLen+=2;
+                    nav.bytesLen = 2;
                     break;
                 case EnumClass::t_ushort:
-                    frameLen+=2;
+                    frameDataLen+=2;
+                    nav.bytesLen = 2;
                     break;
                 case EnumClass::t_int:
-                    frameLen+=4;
+                    frameDataLen+=4;
+                    nav.bytesLen = 4;
                     break;
                 case EnumClass::t_uint:
-                    frameLen+=4;
+                    frameDataLen+=4;
+                    nav.bytesLen = 4;
                     break;
                 case EnumClass::t_float:
-                    frameLen+=4;
+                    frameDataLen+=4;
+                    nav.bytesLen = 4;
                     break;
                 case EnumClass::t_double:
-                    frameLen+=8;
+                    frameDataLen+=8;
+                    nav.bytesLen = 8;
                 default:
                     break;
             }
 
-
+            frameDataArr.push_back(nav);
         }
 
         lastName = info->name;
     }
 
-    frameHeaderSize = frameHeaderArr.size();
-    frameDataSize = frameDataType.size();
+    frameHeaderLen = frameHeaderArr.size();
+    frameLen = frameHeaderLen + frameDataLen + frameCheckLen;
 
-    if(frameHeaderSize<=0 || frameDataSize<=0){
+    if(frameHeaderLen<=0 || frameDataLen<=0){
         errorMsg = QString("必须有帧头和数据");
         return false;
     }
@@ -186,13 +190,11 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
 }
 
 
-// 解析一帧数据
-bool Parse::parseFrameByte(QByteArray &allBytes){
+// 找到一帧数据并解析
+bool Parse::findFrameAndParse(QByteArray &allBytes){
     if(allBytes.size()<frameLen){
         return false;
     }
-
-    bool frameHeaderOk = false;
 
     int startIndex=-1; // 帧头索引
     int dataIndex=0; // 数据头索引，默认为0，检查allBytes,特殊情况下，设置其他值
@@ -203,15 +205,15 @@ bool Parse::parseFrameByte(QByteArray &allBytes){
     if(startIndex<0){
         // 未找到完整帧头，继续查看末尾是否有部分帧头
         int j=0;
-        while(++j<frameHeaderSize){
+        while(++j<frameHeaderLen){
             // 继续找
             t = allBytes.mid(dataIndex);
-            startIndex = t.indexOf(frameHeaderArr.mid(0, frameHeaderSize-j));
+            startIndex = t.indexOf(frameHeaderArr.mid(0, frameHeaderLen-j));
 
             if(startIndex>=0){
                 // 找到子串
 
-                if(startIndex+(frameHeaderSize-j)==t.size()){
+                if(startIndex+(frameHeaderLen-j)==t.size()){
                     // 并且在末尾
                     allBytes.remove(0, startIndex+dataIndex); // 清除 部分帧头 之前的数据
                     return false;
@@ -240,18 +242,28 @@ bool Parse::parseFrameByte(QByteArray &allBytes){
         return false;
     }
 
-    // 检验数据，暂时默认从帧头后到校验数据之间的数据
+
+    // 拆分为 数据 和 校验字节
+    QByteArray frameBytesData = allBytes.mid(startIndex+frameHeaderLen, frameDataLen); // 数据
+    QByteArray frameBytesCehck = allBytes.mid(startIndex+frameHeaderLen+frameDataLen, frameCheckLen); // 数据
+
+    // 检验数据，暂时默认校验的位从帧头后到校验数据之间的数据
     if(frameCheckSumType!=EnumClass::None){
-        if(!checkData(allBytes.mid(startIndex, frameLen))){
+        if(!checkData(frameBytesData, frameBytesCehck)){
             qDebug()<<"check failed";
-            allBytes.remove(0, startIndex+frameHeaderSize); // 清除帧头数据
+            allBytes.remove(0, startIndex+frameHeaderLen); // 清除帧头数据
             return false;
+        }else{
+
         }
     }
 
-    // todo 解析数据
+    // todo 解析数据，只需要数据，不要帧头和校验
+    const QByteArray frameBytes2 = allBytes.mid(startIndex, frameLen);
     qDebug()<<"end"<<startIndex<<" "<<startIndex+frameLen;
     allBytes.remove(0, startIndex+frameLen);
+
+    parseFrameData(frameBytesData);
 
 
 
@@ -260,10 +272,11 @@ bool Parse::parseFrameByte(QByteArray &allBytes){
 
 
 // 校验数据
-bool Parse::checkData(const QByteArray &frameBytes){
+bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkBytes){
 
-    int size = frameBytes.size();
-    if(size!=frameLen){
+    int size = checkDataBytes.size();
+    int cSize = checkBytes.size();
+    if(cSize!=frameCheckLen){
         return false;
     }
 
@@ -272,42 +285,48 @@ bool Parse::checkData(const QByteArray &frameBytes){
 
     switch(frameCheckSumType){
         case EnumClass::c_add8:
-            result[0] = frameBytes.at(frameLen-1);
-            for(int i=frameHeaderSize; i<size-1; i++){
-                r[0]+=(quint8)frameBytes[i];
-            };
-            if(r[0] == result[0]){
-                return true;
+            if(cSize==1){
+                result[0] = checkBytes.at(0);
+                for(int i=0; i<size; i++){
+                    r[0]+=(quint8)checkDataBytes[i];
+                };
+                if(r[0] == result[0]){
+                    return true;
+                }
             }
+
             break;
         case EnumClass::c_xor8:
-            result[0] = frameBytes.at(frameLen-1);
-            for(int i=frameHeaderSize; i<size-1; i++){
-                r[0]^=(quint8)frameBytes[i];
-            };
-            if(r[0] == result[0]){
-                return true;
+            if(cSize==1){
+                result[0] = checkBytes.at(0);
+                for(int i=0; i<size; i++){
+                    r[0]^=(quint8)checkDataBytes[i];
+                };
+                if(r[0] == result[0]){
+                    return true;
+                }
             }
             break;
         case EnumClass::c_crc16_xmodem:
-            // todo: 暂时使用小端
-            if(true){
-                // 小端，先收到的字节在前
-                result[0] = frameBytes.at(frameLen-2);
-                result[1] = frameBytes.at(frameLen-1);
-            }else{
-                // 大端
-                result[0] = frameBytes.at(frameLen-1);
-                result[1] = frameBytes.at(frameLen-2);
-            }
+            if(cSize==2){
+                // todo: 暂时使用小端
+                if(true){
+                    // 小端，先收到的字节在前
+                    result[0] = checkBytes.at(0);
+                    result[1] = checkBytes.at(1);
+                }else{
+                    // 大端
+                    result[0] = checkBytes.at(1);
+                    result[1] = checkBytes.at(0);
+                }
 
+                crcValue = Crc16Xmode(checkDataBytes.data(), frameDataLen);
+                r[0]=crcValue & 0x00FF;
+                r[1]=(crcValue & 0xFF00)>>8;
 
-            crcValue = Crc16Xmode(frameBytes.mid(frameHeaderSize).data(), frameDataSize);
-            r[0]=crcValue & 0x00FF;
-            r[1]=(crcValue & 0xFF00)>>8;
-
-            if(r[0]==result[0] && r[1]==result[1]){
-                return true;
+                if(r[0]==result[0] && r[1]==result[1]){
+                    return true;
+                }
             }
             break;
         default:
@@ -316,8 +335,20 @@ bool Parse::checkData(const QByteArray &frameBytes){
     return false;
 }
 
+// 解析一帧数据
+bool Parse::parseFrameData(const QByteArray &frameBytesData){
+    int size = frameBytesData.size();
+    if(size!=frameDataLen){
+        return false;
+    }
+
+    return false;
+
+}
+
+
 // CRC16 协议解析 (CCITT-Xmodem)
-unsigned short Parse::Crc16Xmode(char *q, int len)
+unsigned short Parse::Crc16Xmode(const char *q, int len)
 {
     static  unsigned short ccitt_table[256] = {
         0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50A5, 0x60C6, 0x70E7,
