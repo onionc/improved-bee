@@ -337,12 +337,73 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
 
 // 解析一帧数据
 bool Parse::parseFrameData(const QByteArray &frameBytesData){
-    int size = frameBytesData.size();
-    if(size!=frameDataLen){
+    int len = frameBytesData.size();
+    int size = frameDataArr.size();
+    // len是字节数，所以这里的size==frameDataLen；size 是字段个数，每个字段可以有多个字节。不能用 frameDataArr.size() 来比对。
+    if(len!=frameDataLen){
         return false;
     }
 
-    return false;
+    quint8 tByte;
+    NAV_Data *nav;
+
+
+    // 分配字节
+    for(int i=0, jLen=0; i<size; i++){
+        nav = &frameDataArr[i];
+        if((jLen+nav->bytesLen) <= frameDataLen){ // jLen用来当数据的索引
+            nav->buf = frameBytesData.mid(jLen, nav->bytesLen);
+            jLen += nav->bytesLen;
+        }else{
+            return false;
+        }
+
+    }
+
+
+
+    // 遍历数据项
+    for(int i=0; i<frameDataArr.size(); i++){
+        nav = &frameDataArr[i];
+        qDebug()<<nav->name<<"-0x"<<nav->buf.toHex();
+
+
+        switch(nav->type){
+            case EnumClass::t_char:
+
+                QString::number(1);
+                break;
+            case EnumClass::t_uchar:
+
+                break;
+            case EnumClass::t_short:
+
+                break;
+            case EnumClass::t_ushort:
+
+                break;
+            case EnumClass::t_int:
+
+                break;
+            case EnumClass::t_uint:
+
+                break;
+            case EnumClass::t_float:
+
+                break;
+            case EnumClass::t_double:
+
+            default:
+                break;
+        }
+
+    }
+
+
+
+
+
+    return true;
 
 }
 
