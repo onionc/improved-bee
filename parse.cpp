@@ -258,16 +258,11 @@ bool Parse::findFrameAndParse(QByteArray &allBytes){
         }
     }
 
-    // todo 解析数据，只需要数据，不要帧头和校验
-    const QByteArray frameBytes2 = allBytes.mid(startIndex, frameLen);
-    qDebug()<<"end"<<startIndex<<" "<<startIndex+frameLen;
+    // 解析数据，只需要数据，不要帧头和校验
+    bool r = parseFrameData(frameBytesData);
     allBytes.remove(0, startIndex+frameLen);
 
-    parseFrameData(frameBytesData);
-
-
-
-    return true;
+    return r;
 }
 
 

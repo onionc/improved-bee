@@ -51,8 +51,12 @@ public:
     // 协议
     // CRC16 协议解析 (CCITT-Xmodem)
     unsigned short Crc16Xmode(const char *q, int len);
-
-    quint16 getFrameLen() {return frameLen;} // 获取帧长
+    // 获取帧长
+    quint16 getFrameLen() {return frameLen;}
+    // 获取原始数据
+    const QVector<NAV_Data>* getNavData(){
+        return &frameDataArr;
+    }
 private:
     // 校验数据，checkDataBytes 为要校验的数据，checkBytes 为校验字节
     bool checkData(const QByteArray &checkDataBytes, const QByteArray &checkBytes);
@@ -70,7 +74,6 @@ private:
     quint16 frameHeaderLen=0; // 帧头字节长度
     quint16 frameDataLen=0; // 数据字节长度
     quint16 frameCheckLen=0; // 校验字节长度
-
 
 };
 

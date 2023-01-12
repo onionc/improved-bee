@@ -31,11 +31,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
-    // 显示数据的表格
+    // 显示数据的表格设置
     showTableWidget = new QTableWidget();
-    showTableWidget->setObjectName("tableWidget2");
-    ui->verticalLayout_2->addWidget(showTableWidget);
-    switchTable(true); // 显示编辑框
+    showTableWidget->setObjectName("showTableWidget");
+    /* 在确认时再动态设置
+    headerText.clear();
+    headerText<<"xx"<<"xx";
+    showTableWidget->setRowCount(headerText.count());
+    showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
+    */
+    showTableWidget->setColumnCount(1); // 列数
+    showTableWidget->horizontalHeader()->setVisible(false); // 水平表头有效
+    showTableWidget->verticalHeader()->setVisible(true); // 竖直表头有效
+    showTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->verticalLayout_2->addWidget(showTableWidget); // 添加到布局内
+
+
+    switchTable(true); // 隐藏表格2，只显示编辑框
 
     // toolBox控制界面设置
     ui->panelBox->setCurrentIndex(0); // 默认第一页
@@ -359,6 +371,20 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 失能按钮
         enableFrameBtn(false);
 
+
+
+        // 设置显示的表格数据
+        QStringList headerText;
+        for(int i=0; i<frameData.size(); i++){
+            headerText << frameData[i].name;
+        }
+        showTableWidget->setRowCount(headerText.count());
+        showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
+        for(int i=0; i<frameData.size(); i++){
+            showTableWidget->setItem(i, 0,new QTableWidgetItem());
+        }
+
+
         // 切换表格
         switchTable(false);
 
@@ -517,8 +543,12 @@ void MainWindow::slot_taskScheduler(){
     // 解析数据
     qDebug()<<"buf before:"<<recvBuf.size();
     qDebug()<<"parse.frame:"<<parse.getFrameLen();
+    const QVector<NAV_Data> *navData;
     while(recvBuf.size()>=parse.getFrameLen()){
-        parse.findFrameAndParse(recvBuf);
+
+        if(parse.findFrameAndParse(recvBuf)){
+            navData = parse.getNavData();
+        }
     }
     qDebug()<<"buf after:"<<recvBuf.size();
 
