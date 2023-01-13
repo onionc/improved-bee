@@ -365,11 +365,8 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
 
         switch(nav->type){
             case EnumClass::t_char:
-
-                QString::number(1);
                 break;
             case EnumClass::t_uchar:
-
                 break;
             case EnumClass::t_short:
 

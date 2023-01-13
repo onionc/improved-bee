@@ -1,6 +1,8 @@
 #include "util.h"
 #include "XString.h"
 
+static bool smallEndian = true;
+
 // 获取日期或日期时间
 QString util::getDatetime(bool onlyDate, bool name){
     QDateTime time = QDateTime::currentDateTime();
@@ -116,4 +118,87 @@ void util::WriteFile::write(QString s){
 
 QString util::WriteFile::getFilePath(){
     return filePath;
+}
+
+
+
+/*
+小端 [0x12,0x34, 0x56,0x78] => 0x12345678;
+大端 [0x12,0x34, 0x56,0x78] => 0x78563412;
+*/
+
+// convert 4 bytes to float
+float util::bytes2float(quint8 arr[])
+{
+    static bytes4float b;
+    for(int i=0;i<4;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[3-i] = arr[i];
+        }
+    }
+    return b.f;
+}
+
+double util::bytes2double(quint8 arr[])
+{
+    static bytes8double b;
+    for(int i=0;i<8;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[7-i] = arr[i];
+        }
+    }
+    return b.d;
+}
+qint16 util::bytes2short(quint8 arr[])
+{
+    static bytesShort b;
+    for(int i=0;i<2;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[1-i] = arr[i];
+        }
+    }
+    return b.d;
+}
+quint16 util::bytes2ushort(quint8 arr[])
+{
+    static bytesUshort b;
+    for(int i=0;i<2;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[1-i] = arr[i];
+        }
+    }
+    return b.d;
+}
+
+qint32 util::bytes2int(quint8 arr[])
+{
+    static bytesInt b;
+    for(int i=0;i<4;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[3-i] = arr[i];
+        }
+    }
+    return b.d;
+}
+quint32 util::bytes2uint(quint8 arr[])
+{
+    bytesUint b;
+    for(int i=0;i<4;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[3-i] = arr[i];
+        }
+    }
+    return b.d;
 }

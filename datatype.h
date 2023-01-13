@@ -24,11 +24,25 @@ namespace DATA{
         enum typeListEnum{t_char=0, t_uchar, t_short, t_ushort, t_int, t_uint, t_float, t_double};
         Q_ENUM(typeListEnum)
 
+
+
         // 校验类型列表
         enum checkSumListEnum{None=0, c_add8, c_xor8, c_crc16_xmodem};
         Q_ENUM(checkSumListEnum)
 
     };
+    // 类型
+    typedef union typeUnion{
+        qint8 t_char;
+        quint8 t_uchar;
+        qint16 t_short;
+        quint16 t_ushort;
+        qint32 t_int;
+        quint32 t_uint;
+        float t_float;
+        double t_double;
+    }type;
+
     const extern QStringList typeList;
     const extern QStringList checkSumList;
     // 枚举转字符串
@@ -63,6 +77,8 @@ namespace DATA{
         EnumClass::typeListEnum type; // 类型
         quint8 bytesLen; // 类型对应的数据长度
         QByteArray buf; // 数组
+        // 数据
+        typeUnion data;
     }NAV_Data;
 
 }

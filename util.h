@@ -37,6 +37,45 @@ namespace util{
             // 返回文件名
             QString getFilePath();
     };
+
+
+    // 类型转换
+    union bytes4float
+    {
+        float f;
+        quint8 byte_arr[4];
+    };
+
+    union bytes8double
+    {
+        double d;
+        quint8 byte_arr[8];
+    };
+    union bytesShort
+    {
+        qint16 d;
+        quint8 byte_arr[2];
+    };
+
+    union bytesUshort{
+        quint16 d;
+        quint8 byte_arr[2];
+    };
+    union bytesInt {
+        qint32 d;
+        quint8 byte_arr[4];
+    };
+    union bytesUint {
+        quint32 d;
+        quint8 byte_arr[4];
+    };
+    float bytes2float(quint8 arr[]);
+    double bytes2double(quint8 arr[]);
+    qint16 bytes2short(quint8 arr[]);
+    quint16 bytes2ushort(quint8 arr[]);
+
+    qint32 bytes2int(quint8 arr[]);
+    quint32 bytes2uint(quint8 arr[]);
 }
 
 
