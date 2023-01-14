@@ -356,47 +356,47 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
     }
 
 
-
+    quint8 * dp;
     // 遍历数据项
     for(int i=0; i<frameDataArr.size(); i++){
         nav = &frameDataArr[i];
         qDebug()<<nav->name<<"-0x"<<nav->buf.toHex();
 
-
+        dp = (quint8*)nav->buf.data();
         switch(nav->type){
             case EnumClass::t_char:
+                nav->data.t_char = qint8(*dp);
                 break;
             case EnumClass::t_uchar:
+                nav->data.t_uchar = quint8(*dp);
                 break;
             case EnumClass::t_short:
-
+                nav->data.t_short = util::bytes2short(dp);
                 break;
             case EnumClass::t_ushort:
-
+                nav->data.t_ushort = util::bytes2ushort(dp);
                 break;
             case EnumClass::t_int:
-
+                nav->data.t_int = util::bytes2int(dp);
                 break;
             case EnumClass::t_uint:
-
+                nav->data.t_uint = util::bytes2uint(dp);
                 break;
             case EnumClass::t_float:
-
+                nav->data.t_float = util::bytes2float(dp);
                 break;
             case EnumClass::t_double:
-
+                nav->data.t_double = util::bytes2double(dp);
+                break;
             default:
+                PLOGD<<"类型错误";
+                return false;
                 break;
         }
 
     }
 
-
-
-
-
     return true;
-
 }
 
 

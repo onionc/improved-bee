@@ -375,12 +375,12 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
         // 设置显示的表格数据
         QStringList headerText;
-        for(int i=0; i<frameData.size(); i++){
-            headerText << frameData[i].name;
+        for(int i=0; i<parse.getFrameDataLen(); i++){
+            headerText << parse.getNavData()->value(i).name;
         }
         showTableWidget->setRowCount(headerText.count());
         showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
-        for(int i=0; i<frameData.size(); i++){
+        for(int i=0; i<parse.getFrameDataLen(); i++){
             showTableWidget->setItem(i, 0,new QTableWidgetItem());
         }
 
@@ -548,6 +548,11 @@ void MainWindow::slot_taskScheduler(){
 
         if(parse.findFrameAndParse(recvBuf)){
             navData = parse.getNavData();
+            // 动态更新表格数据
+            for(int i=0; i<parse.getFrameDataLen(); i++){
+                showTableWidget->item(i, 0)->setText(navData->value(i).getDataStr());
+            }
+
         }
     }
     qDebug()<<"buf after:"<<recvBuf.size();

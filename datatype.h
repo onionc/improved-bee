@@ -9,6 +9,7 @@
 #include <QMetaEnum>
 #include <QObject>
 #include <QtCore>
+#include "util.h"
 
 // 通过枚举类型获取字符串
 #define typeS(a) DATA::typeListStr(a)
@@ -79,6 +80,25 @@ namespace DATA{
         QByteArray buf; // 数组
         // 数据
         typeUnion data;
+
+        // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
+        const QString getDataStr(){
+            QString s;
+            switch(type){
+                case EnumClass::t_char: s = QString("%1").arg(data.t_char); break;
+                case EnumClass::t_uchar: s = QString("%1").arg(data.t_uchar); break;
+                case EnumClass::t_short: s = QString("%1").arg(data.t_short); break;
+                case EnumClass::t_ushort: s = QString("%1").arg(data.t_ushort); break;
+                case EnumClass::t_int: s = QString("%1").arg(data.t_int); break;
+                case EnumClass::t_uint: s = QString("%1").arg(data.t_uint); break;
+                case EnumClass::t_float: s = QString("%1").arg(data.t_float); break;
+                case EnumClass::t_double: s = QString("%1").arg(data.t_double); break;
+                default:
+                    s = "";
+                    break;
+            }
+            return s;
+        }
     }NAV_Data;
 
 }

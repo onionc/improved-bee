@@ -13,6 +13,7 @@
 #include <QVector>
 #include <QMessageBox>
 #include <QDebug>
+#include "util.h"
 
 using namespace DATA;
 
@@ -57,6 +58,10 @@ public:
     const QVector<NAV_Data>* getNavData(){
         return &frameDataArr;
     }
+    int getFrameDataLen(){
+        return frameDataLen;
+    }
+
 private:
     // 校验数据，checkDataBytes 为要校验的数据，checkBytes 为校验字节
     bool checkData(const QByteArray &checkDataBytes, const QByteArray &checkBytes);
