@@ -52,13 +52,26 @@ MainWindow::MainWindow(QWidget *parent) :
     // toolBox控制界面设置
     ui->panelBox->setCurrentIndex(0); // 默认第一页
 
+
+    // 日志
+    util::logInit();
+
+
     // 协议
     on_addHeaderBtn_clicked(); // 插入一行帧头
     ui->confirmFrameBtn->setCheckable(true);
     ui->confirmFrameBtn->setChecked(false);
 
-    // 日志
-    util::logInit();
+    QStringList endian, hz;
+    endian<<"小端"<<"大端";
+    ui->endian_comboBox->addItems(endian);
+    ui->endian_comboBox->setCurrentIndex(0);
+    hz<<"1"<<"5"<<"10"<<"20"<<"50"<<"100"<<"200"<<"500"<<"1000"<<"2000";
+    ui->hz_comboBox->addItems(hz);
+    ui->hz_comboBox->setCurrentText("200");
+
+    frameLittleEndian = true; // 默认字节序：小端
+    frameHz = 200; // 默认频率：200Hz
 
     // 串口设置
     QStringList baudrate, dataBit, stopBit, parity;
@@ -73,7 +86,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->stopBit_comboBox->setCurrentText("1");
     parity<<"无"<<"奇校验"<<"偶校验"<<"Space"<<"Mask";
     ui->parity_comboBox->addItems(parity);
-    ui->parity_comboBox->setCurrentText(0);
+    ui->parity_comboBox->setCurrentIndex(0);
+
+
 
 
     // 状态设置
@@ -362,6 +377,14 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
             return;
         }
 
+        // 获取字节序和频率
+        frameLittleEndian = ui->endian_comboBox->currentIndex()==0;
+        frameHz = ui->hz_comboBox->currentData().toUInt();
+
+        qDebug()<<frameLittleEndian;
+        util::smallEndian = frameLittleEndian; // 字节序赋值
+qDebug()<<"smallEndian="<<util::smallEndian;
+
         // 设置界面
         ui->confirmFrameBtn->setText("编辑数据协议");
         // 失能表格
@@ -375,12 +398,12 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
         // 设置显示的表格数据
         QStringList headerText;
-        for(int i=0; i<parse.getFrameDataLen(); i++){
+        for(int i=0; i<parse.getFrameDataSize(); i++){
             headerText << parse.getNavData()->value(i).name;
         }
         showTableWidget->setRowCount(headerText.count());
         showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
-        for(int i=0; i<parse.getFrameDataLen(); i++){
+        for(int i=0; i<parse.getFrameDataSize(); i++){
             showTableWidget->setItem(i, 0,new QTableWidgetItem());
         }
 
@@ -428,6 +451,9 @@ void MainWindow::enableFrameBtn(bool state){
         }
         a->setEnabled(state);
     }
+
+    ui->endian_comboBox->setEnabled(state);
+    ui->hz_comboBox->setEnabled(state);
 }
 
 
@@ -544,12 +570,13 @@ void MainWindow::slot_taskScheduler(){
     qDebug()<<"buf before:"<<recvBuf.size();
     qDebug()<<"parse.frame:"<<parse.getFrameLen();
     const QVector<NAV_Data> *navData;
+    qDebug()<<"smallEndian22="<<util::smallEndian;
     while(recvBuf.size()>=parse.getFrameLen()){
 
         if(parse.findFrameAndParse(recvBuf)){
             navData = parse.getNavData();
             // 动态更新表格数据
-            for(int i=0; i<parse.getFrameDataLen(); i++){
+            for(int i=0; i<parse.getFrameDataSize(); i++){
                 showTableWidget->item(i, 0)->setText(navData->value(i).getDataStr());
             }
 

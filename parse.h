@@ -58,8 +58,8 @@ public:
     const QVector<NAV_Data>* getNavData(){
         return &frameDataArr;
     }
-    int getFrameDataLen(){
-        return frameDataLen;
+    int getFrameDataSize(){
+        return frameDataArr.size();
     }
 
 private:

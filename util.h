@@ -40,6 +40,7 @@ namespace util{
 
 
     // 类型转换
+    extern bool smallEndian;
     union bytes4float
     {
         float f;

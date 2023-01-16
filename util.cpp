@@ -1,7 +1,7 @@
 #include "util.h"
 #include "XString.h"
 
-static bool smallEndian = true;
+bool util::smallEndian = true;
 
 // 获取日期或日期时间
 QString util::getDatetime(bool onlyDate, bool name){

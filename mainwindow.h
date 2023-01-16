@@ -43,6 +43,8 @@ private:
     // 数据协议
     void frameFormat(); // 协议格式化，从table获取数据转为vector
     bool frameChecked; // 数据协议确认
+    bool frameLittleEndian; // =true 小端字节序, =false 大端
+    quint32 frameHz; // 频率
 
     // 串口
     bool isOpenSerialPort; // 串口是否打开

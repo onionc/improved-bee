@@ -304,8 +304,8 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
             break;
         case EnumClass::c_crc16_xmodem:
             if(cSize==2){
-                // todo: 暂时使用小端
-                if(true){
+                qDebug()<<"util::smallEndian="<<util::smallEndian;
+                if(util::smallEndian){
                     // 小端，先收到的字节在前
                     result[0] = checkBytes.at(0);
                     result[1] = checkBytes.at(1);
