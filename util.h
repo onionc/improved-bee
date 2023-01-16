@@ -7,6 +7,9 @@
 #include <QDir>
 #include "plog/Log.h"
 #include "plog/Initializers/RollingFileInitializer.h"
+#include <QVariant>
+#include <QSettings>
+#include <QTextCodec>
 
 namespace util{
 
@@ -77,6 +80,13 @@ namespace util{
 
     qint32 bytes2int(quint8 arr[]);
     quint32 bytes2uint(quint8 arr[]);
+
+
+    // 写入ini文件
+    void writeIni(QString saveFilename, QString key, QVariant value);
+
+    // 读取ini
+    QVariant readIni(QString readFilename, QString key);
 }
 
 

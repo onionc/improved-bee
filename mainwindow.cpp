@@ -68,10 +68,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->endian_comboBox->setCurrentIndex(0);
     hz<<"1"<<"5"<<"10"<<"20"<<"50"<<"100"<<"200"<<"500"<<"1000"<<"2000";
     ui->hz_comboBox->addItems(hz);
-    ui->hz_comboBox->setCurrentText("200");
+    ui->hz_comboBox->setCurrentText(QString("%1").arg(DEFAULT_HZ));
 
     frameLittleEndian = true; // 默认字节序：小端
-    frameHz = 200; // 默认频率：200Hz
+    frameHz = DEFAULT_HZ; // 默认频率：200Hz
 
     // 串口设置
     QStringList baudrate, dataBit, stopBit, parity;
@@ -338,6 +338,14 @@ void MainWindow::on_loadFrameBtn_clicked()
 
     // 从ini文件读取协议
     parse.loadFromIni(loadFilename, &frameData);
+    // 读取其他字段
+
+    // 其他配置：字节序、频率
+    frameLittleEndian = util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toInt()==0;
+    frameHz = util::readIni(loadFilename, QString("%1/hz").arg(INI_OTHER)).toInt();
+    if(frameHz<1 || frameHz>2000){
+        frameHz = DEFAULT_HZ;
+    }
 
     // 显示到table
     QString name, data;
@@ -380,10 +388,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 获取字节序和频率
         frameLittleEndian = ui->endian_comboBox->currentIndex()==0;
         frameHz = ui->hz_comboBox->currentData().toUInt();
-
-        qDebug()<<frameLittleEndian;
         util::smallEndian = frameLittleEndian; // 字节序赋值
-qDebug()<<"smallEndian="<<util::smallEndian;
 
         // 设置界面
         ui->confirmFrameBtn->setText("编辑数据协议");
@@ -567,10 +572,7 @@ void MainWindow::slot_taskScheduler(){
     }
 
     // 解析数据
-    qDebug()<<"buf before:"<<recvBuf.size();
-    qDebug()<<"parse.frame:"<<parse.getFrameLen();
     const QVector<NAV_Data> *navData;
-    qDebug()<<"smallEndian22="<<util::smallEndian;
     while(recvBuf.size()>=parse.getFrameLen()){
 
         if(parse.findFrameAndParse(recvBuf)){

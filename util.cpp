@@ -202,3 +202,23 @@ quint32 util::bytes2uint(quint8 arr[])
     }
     return b.d;
 }
+
+
+
+// 写入ini文件
+void util::writeIni(QString saveFilename, QString key, QVariant value){
+
+    QSettings write(saveFilename, QSettings::IniFormat);
+    write.setIniCodec(QTextCodec::codecForName("UTF-8"));
+    //write.clear();
+
+    write.setValue(key, value);
+}
+
+
+// 读取ini
+QVariant util::readIni(QString readFilename, QString key){
+    // 打开ini文件
+    QSettings read(readFilename, QSettings::IniFormat);
+    return read.value(key);
+}

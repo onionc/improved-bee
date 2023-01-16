@@ -18,17 +18,17 @@ void Parse::writeToIni(const QVector<SProperty> *data, QString saveFilename){
     for(int i=0; i<data->size(); i++){
         const SProperty *info = &data->at(i);
         // 是否选定
-        write.setValue(QString("%1/checked").arg(i), info->checked);
+        write.setValue(QString("Data_%1/checked").arg(i), info->checked);
 
         // 名称、类型、数据
-        write.setValue(QString("%1/name").arg(i), info->name);
-        write.setValue(QString("%1/type").arg(i), info->type);
-        write.setValue(QString("%1/data").arg(i), info->data);
+        write.setValue(QString("Data_%1/name").arg(i), info->name);
+        write.setValue(QString("Data_%1/type").arg(i), info->type);
+        write.setValue(QString("Data_%1/data").arg(i), info->data);
 
         // 图表绘图项是否选定
-        write.setValue(QString("%1/curve1").arg(i), info->curve1);
-        write.setValue(QString("%1/curve2").arg(i), info->curve2);
-        write.setValue(QString("%1/curve3").arg(i), info->curve3);
+        write.setValue(QString("Data_%1/curve1").arg(i), info->curve1);
+        write.setValue(QString("Data_%1/curve2").arg(i), info->curve2);
+        write.setValue(QString("Data_%1/curve3").arg(i), info->curve3);
     }
 }
 
@@ -41,16 +41,19 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
     QStringList allGroups = read.childGroups();
     data->clear();
     foreach(QString groupKey, allGroups){
-        SProperty info;
-        info.name = read.value(QString("%1/name").arg(groupKey)).toString();
-        info.type = read.value(QString("%1/type").arg(groupKey)).toString();
-        info.data = read.value(QString("%1/data").arg(groupKey)).toString();
+        if(groupKey.startsWith("Data")){
+            // Data开头的为协议
+            SProperty info;
+            info.name = read.value(QString("%1/name").arg(groupKey)).toString();
+            info.type = read.value(QString("%1/type").arg(groupKey)).toString();
+            info.data = read.value(QString("%1/data").arg(groupKey)).toString();
 
-        info.checked = read.value(QString("%1/checked").arg(groupKey)).toBool();
-        info.curve1 = read.value(QString("%1/curve1").arg(groupKey)).toBool();
-        info.curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool();
-        info.curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool();
-        data->push_back(info);
+            info.checked = read.value(QString("%1/checked").arg(groupKey)).toBool();
+            info.curve1 = read.value(QString("%1/curve1").arg(groupKey)).toBool();
+            info.curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool();
+            info.curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool();
+            data->push_back(info);
+        }
     }
 }
 
@@ -304,7 +307,6 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
             break;
         case EnumClass::c_crc16_xmodem:
             if(cSize==2){
-                qDebug()<<"util::smallEndian="<<util::smallEndian;
                 if(util::smallEndian){
                     // 小端，先收到的字节在前
                     result[0] = checkBytes.at(0);

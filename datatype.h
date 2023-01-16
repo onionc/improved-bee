@@ -11,6 +11,9 @@
 #include <QtCore>
 #include "util.h"
 
+#define DEFAULT_HZ 200
+#define INI_OTHER "Other"
+
 // 通过枚举类型获取字符串
 #define typeS(a) DATA::typeListStr(a)
 #define checkS(a) DATA::checkSumListStr(a)
