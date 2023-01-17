@@ -586,7 +586,7 @@ void MainWindow::slot_serialPortOpenState(bool checked){
             }
         }
 
-        QMessageBox::information(this, "提醒", "文件保存目录："+path);
+        LogShow("文件保存目录："+path);
 
     }else{
         ui->confirmFrameBtn->setEnabled(true);
@@ -653,3 +653,26 @@ void MainWindow::slot_taskScheduler(){
     }
 
 }
+
+// 显示日志
+void MainWindow::LogShow(QString info, bool format){
+    static int i=1;
+
+    if(i>100){
+        ui->logBrowser->setText("");
+        i=1;
+    }
+
+    PLOGD.printf("LogShow: %s", qPrintable(info));
+
+
+    // 给消息添加序号和 换行
+    if(format){
+        info = QString("%1: %2").arg(i++).arg(info);
+        ui->logBrowser->append(info);
+    }else{
+        ui->logBrowser->insertPlainText(info);
+    }
+
+}
+

@@ -67,6 +67,10 @@ private:
     util::WriteFile f1sFile;
     util::WriteFile f10sFile;
 
+    // 日志
+
+    void LogShow(QString info, bool format=true); // 显示日志
+
 
 private slots:
     // ---- 数据协议 ----
