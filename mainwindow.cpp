@@ -72,6 +72,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     frameLittleEndian = true; // 默认字节序：小端
     frameHz = DEFAULT_HZ; // 默认频率：200Hz
+    // 通过信号槽改变字节序和频率变量
+    connect(ui->endian_comboBox, static_cast<void(QComboBox::*)(int index)>(&QComboBox::currentIndexChanged),
+            [=](int index){
+                frameLittleEndian = index==0;
+            }
+    );
+    connect(ui->hz_comboBox, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
+            [=](const QString &t){
+                frameHz = t.toInt();
+                if(frameHz<1 || frameHz>2000){
+                    frameHz = DEFAULT_HZ;
+                }
+            }
+    );
 
     // 串口设置
     QStringList baudrate, dataBit, stopBit, parity;
@@ -307,8 +321,12 @@ void MainWindow::on_saveFrameBtn_clicked()
     // 转义数据
     frameFormat();
 
-    // 保存数据到ini文件
+    // 保存协议到ini文件
     parse.writeToIni(&frameData, saveFilename);
+    // 保存其他
+    util::writeIni(saveFilename, QString("%1/endian").arg(INI_OTHER), frameLittleEndian);
+    util::writeIni(saveFilename, QString("%1/hz").arg(INI_OTHER), frameHz);
+
 }
 
 // 清除表格数据
@@ -339,13 +357,9 @@ void MainWindow::on_loadFrameBtn_clicked()
     // 从ini文件读取协议
     parse.loadFromIni(loadFilename, &frameData);
     // 读取其他字段
-
-    // 其他配置：字节序、频率
-    frameLittleEndian = util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toInt()==0;
-    frameHz = util::readIni(loadFilename, QString("%1/hz").arg(INI_OTHER)).toInt();
-    if(frameHz<1 || frameHz>2000){
-        frameHz = DEFAULT_HZ;
-    }
+    // 其他配置：字节序、频率，会通过槽函数更新变量
+    ui->endian_comboBox->setCurrentIndex(util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toBool()?0:1);
+    ui->hz_comboBox->setCurrentText(util::readIni(loadFilename, QString("%1/hz").arg(INI_OTHER)).toString());
 
     // 显示到table
     QString name, data;
