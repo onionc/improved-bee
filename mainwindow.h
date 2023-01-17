@@ -59,6 +59,15 @@ private:
     QVector<SProperty> frameData; // 协议
     QByteArray recvBuf; // 接收的字节数据
 
+    // 存储文件
+    bool bSaveRawFlag; // 原始数据标志
+    bool bSave1sFlag; // 1s数据
+    bool bSave10sFlag; // 10数据
+    util::WriteFile fRawFile, fNavDataFile; // raw存储原始数据，navData存储解析后数据
+    util::WriteFile f1sFile;
+    util::WriteFile f10sFile;
+
+
 private slots:
     // ---- 数据协议 ----
 

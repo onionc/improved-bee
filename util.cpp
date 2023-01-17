@@ -116,6 +116,13 @@ void util::WriteFile::write(QString s){
     }
 }
 
+void util::WriteFile::write(QByteArray arr){
+    if(ostrm->is_open()){
+        ostrm->write(arr.constData(), arr.size());
+        ostrm->flush();
+    }
+}
+
 QString util::WriteFile::getFilePath(){
     return filePath;
 }

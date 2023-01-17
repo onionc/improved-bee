@@ -72,9 +72,12 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="16,4">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
        <item>
         <widget class="QToolBox" name="panelBox">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="font">
           <font>
            <family>Microsoft YaHei UI</family>
@@ -99,7 +102,7 @@
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <property name="tabSpacing">
           <number>6</number>
@@ -110,7 +113,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>224</height>
+            <height>312</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -157,6 +160,7 @@
               <font>
                <weight>50</weight>
                <bold>false</bold>
+               <underline>false</underline>
               </font>
              </property>
              <property name="layoutDirection">
@@ -419,7 +423,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>224</height>
+            <height>312</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -671,7 +675,7 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="6" column="1">
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -684,7 +688,89 @@
              </property>
             </spacer>
            </item>
-           <item row="6" column="1">
+           <item row="9" column="0" colspan="2">
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="1">
+              <widget class="QCheckBox" name="save1s_cbx">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>ArrowCursor</cursorShape>
+               </property>
+               <property name="toolTip">
+                <string>数据无价</string>
+               </property>
+               <property name="text">
+                <string>1s</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="saveRaw_cbx">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>ArrowCursor</cursorShape>
+               </property>
+               <property name="toolTip">
+                <string>数据无价</string>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="text">
+                <string>原始数</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="tristate">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="save10s_cbx">
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>10s</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="1">
             <widget class="QPushButton" name="openPortBtn">
              <property name="minimumSize">
               <size>
@@ -712,6 +798,19 @@
              </property>
             </widget>
            </item>
+           <item row="5" column="0">
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="page_3">
@@ -720,7 +819,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>224</height>
+            <height>312</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -732,9 +831,6 @@
           </attribute>
          </widget>
         </widget>
-       </item>
-       <item>
-        <widget class="QTextBrowser" name="textBrowser"/>
        </item>
       </layout>
      </item>

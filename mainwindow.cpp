@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->confirmFrameBtn->setCheckable(true);
     ui->confirmFrameBtn->setChecked(false);
 
+    // 字节序和频率设置
     QStringList endian, hz;
     endian<<"小端"<<"大端";
     ui->endian_comboBox->addItems(endian);
@@ -126,7 +127,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 主线程定时器, 任务调度 10ms
     runTimer = new QTimer(this);
-    runTimer->setInterval(3000);  //10ms
+    runTimer->setInterval(10);  //10ms
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
 
@@ -137,6 +138,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 协议未确认
     frameChecked = false;
+
+    // 文件
+    bSaveRawFlag = bSave1sFlag = bSave10sFlag = false;
 }
 
 MainWindow::~MainWindow()
@@ -544,6 +548,46 @@ void MainWindow::slot_serialPortOpenState(bool checked){
         recvBuf.clear(); // 清除临时存储的数据
         runTimer->start(); // 任务开始执行
 
+        // 保存文件选项
+        bSaveRawFlag = ui->saveRaw_cbx->checkState()==Qt::Checked;
+        bSave1sFlag =  ui->save1s_cbx->checkState()==Qt::Checked;
+        bSave10sFlag = ui->save10s_cbx->checkState()==Qt::Checked;
+        // 新建目录
+        QString path = QString("data/%1").arg(util::getDatetime(false, true));
+
+        if(bSaveRawFlag){
+            fRawFile.close();
+            fNavDataFile.close();
+
+            if(!fRawFile.open(path+"/data.raw")){
+                QMessageBox::warning(this, "error", "文件创建失败");
+                return;
+            }
+            if(!fNavDataFile.open(path+"/navFile.csv")){
+                QMessageBox::warning(this, "error", "文件创建失败");
+                return;
+            }
+
+        }
+
+        if(bSave1sFlag){
+            f1sFile.close();
+            if(!f1sFile.open(path+"/oneSecFile.csv")){
+                QMessageBox::warning(this, "error", "文件创建失败");
+                return;
+            }
+        }
+
+        if(bSave10sFlag){
+            f10sFile.close();
+            if(!f10sFile.open(path+"/tenSecFile.csv")){
+                QMessageBox::warning(this, "error", "文件创建失败");
+                return;
+            }
+        }
+
+        QMessageBox::information(this, "提醒", "文件保存目录："+path);
+
     }else{
         ui->confirmFrameBtn->setEnabled(true);
 
@@ -563,6 +607,13 @@ void MainWindow::slot_serialPortCloseState(bool checked){
         ui->openPortBtn->setText("连接串口");
 
         runTimer->stop(); // 任务停止执行
+
+        // 关闭文件保存
+        fRawFile.close();
+        fNavDataFile.close();
+        f1sFile.close();
+        f10sFile.close();
+
     }else{
         ui->confirmFrameBtn->setEnabled(false);
 
@@ -575,20 +626,22 @@ void MainWindow::slot_serialPortCloseState(bool checked){
 }
 
 
-// 任务调度：数据处理、绘图
+// 任务调度：数据处理（保存，解析）、绘图
 void MainWindow::slot_taskScheduler(){
     // 处理数据
 
     if(rwLock.tryLockForWrite(3)){
         recvBuf += serialPort->recvBuf;
+        // 保存原始数据
+        fRawFile.write(recvBuf);
         serialPort->recvBuf.clear();
+
         rwLock.unlock();
     }
 
     // 解析数据
     const QVector<NAV_Data> *navData;
     while(recvBuf.size()>=parse.getFrameLen()){
-
         if(parse.findFrameAndParse(recvBuf)){
             navData = parse.getNavData();
             // 动态更新表格数据
@@ -598,6 +651,5 @@ void MainWindow::slot_taskScheduler(){
 
         }
     }
-    qDebug()<<"buf after:"<<recvBuf.size();
 
 }

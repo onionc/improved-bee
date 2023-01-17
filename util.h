@@ -10,6 +10,7 @@
 #include <QVariant>
 #include <QSettings>
 #include <QTextCodec>
+#include <QByteArray>
 
 namespace util{
 
@@ -37,6 +38,7 @@ namespace util{
 
             // 写数据
             void write(QString s);
+            void write(QByteArray arr);
             // 返回文件名
             QString getFilePath();
     };
