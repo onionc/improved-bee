@@ -29,18 +29,6 @@ public:
     // 从ini文件读取
     void loadFromIni(QString readFilename, QVector<SProperty> *data);
 
-
-
-
-    /*
-    QVector<EnumClass::typeListEnum> frameDataType; // 数据类型
-    QVector<QString> frameDataName; // 数据名称
-
-    */
-
-
-
-
     // 协议帧信息解析：查找帧头、校验、帧长
     bool parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg);
 
@@ -58,9 +46,9 @@ public:
     const QVector<NAV_Data>* getNavData(){
         return &frameDataArr;
     }
-    int getFrameDataSize(){
-        return frameDataArr.size();
-    }
+
+    // 帧数据写入文件
+    void writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool addHeader=false);
 
 private:
     // 校验数据，checkDataBytes 为要校验的数据，checkBytes 为校验字节

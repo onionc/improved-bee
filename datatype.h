@@ -85,7 +85,7 @@ namespace DATA{
         typeUnion data;
 
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
-        const QString getDataStr(){
+        const QString getDataStr() const{
             QString s;
             switch(type){
                 case EnumClass::t_char: s = QString("%1").arg(data.t_char); break;

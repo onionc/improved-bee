@@ -171,6 +171,7 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                 case EnumClass::t_double:
                     frameDataLen+=8;
                     nav.bytesLen = 8;
+                    break;
                 default:
                     break;
             }
@@ -443,4 +444,34 @@ unsigned short Parse::Crc16Xmode(const char *q, int len)
     while (len-- > 0)
         crc = ccitt_table[(crc >> 8 ^ *q++) & 0xff] ^ (crc << 8);
     return crc;
+}
+
+
+// 帧数据写入文件
+void Parse::writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool addHeader){
+    QString header="", line="";
+    int size = navData->size();
+    for(int i=0; i<size; i++){
+        // 标题栏
+        if(addHeader){
+            header += navData->value(i).name;
+
+            if(i<size-1){
+                header.append(", ");
+            }
+        }
+
+        line += navData->value(i).getDataStr();
+
+        // 最后一列数据无逗号
+        if(i<size-1){
+            line.append(", ");
+        }
+    }
+
+    if(addHeader){
+        *fp<<qPrintable(header)<<"\r\n";
+    }
+
+    *fp<<line.toStdString()<<"\r\n"<<std::flush;
 }

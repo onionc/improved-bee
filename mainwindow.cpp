@@ -405,7 +405,13 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
         // 获取字节序和频率
         frameLittleEndian = ui->endian_comboBox->currentIndex()==0;
-        frameHz = ui->hz_comboBox->currentData().toUInt();
+        frameHz = ui->hz_comboBox->currentText().toUInt();
+        if(frameHz<1 || frameHz>2000){
+            ui->confirmFrameBtn->setChecked(false);
+            QMessageBox::critical(this, "error", "频率获取失败");
+            return;
+        }
+
         util::smallEndian = frameLittleEndian; // 字节序赋值
 
         // 设置界面
@@ -421,12 +427,12 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
         // 设置显示的表格数据
         QStringList headerText;
-        for(int i=0; i<parse.getFrameDataSize(); i++){
+        for(int i=0; i<parse.getNavData()->size(); i++){
             headerText << parse.getNavData()->value(i).name;
         }
         showTableWidget->setRowCount(headerText.count());
         showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
-        for(int i=0; i<parse.getFrameDataSize(); i++){
+        for(int i=0; i<parse.getNavData()->size(); i++){
             showTableWidget->setItem(i, 0,new QTableWidgetItem());
         }
 
@@ -588,6 +594,11 @@ void MainWindow::slot_serialPortOpenState(bool checked){
 
         LogShow("文件保存目录："+path);
 
+        // 数据重置
+        oneSecData.clear();
+        tenSecData.clear();
+        dataCount = 0;
+
     }else{
         ui->confirmFrameBtn->setEnabled(true);
 
@@ -633,7 +644,8 @@ void MainWindow::slot_taskScheduler(){
     if(rwLock.tryLockForWrite(3)){
         recvBuf += serialPort->recvBuf;
         // 保存原始数据
-        fRawFile.write(recvBuf);
+        if(bSaveRawFlag)
+            fRawFile.write(recvBuf);
         serialPort->recvBuf.clear();
 
         rwLock.unlock();
@@ -641,14 +653,112 @@ void MainWindow::slot_taskScheduler(){
 
     // 解析数据
     const QVector<NAV_Data> *navData;
+    QString ts;
+    const NAV_Data *info;
     while(recvBuf.size()>=parse.getFrameLen()){
+        // 找并解析一帧数
         if(parse.findFrameAndParse(recvBuf)){
             navData = parse.getNavData();
-            // 动态更新表格数据
-            for(int i=0; i<parse.getFrameDataSize(); i++){
-                showTableWidget->item(i, 0)->setText(navData->value(i).getDataStr());
+
+            // 保存一帧数据
+            if(bSaveRawFlag){
+                parse.writeFile(fNavDataFile.ostrm, navData);
             }
 
+            if(frameHz<=0) continue;
+
+            // 1s 10s数据
+            for(unsigned int j=0; j<navData->size(); j++){
+                // 累加1s数据
+
+                info = &(navData->at(j));
+                qDebug()<<"hz"<<frameHz;
+
+                if(dataCount%frameHz==0){
+                    // 第一次写入数据
+                    oneSecData.push_back(*info);
+
+                    // 动态更新表格数据
+                    showTableWidget->item(j, 0)->setText(info->getDataStr());
+                }else{
+                    // todo: 通过ui上勾选的项，区分瞬时项和累加项 (瞬时值如果用第一个数，这里也可以不进行赋值)
+                    if(false){
+                        // 瞬时值
+                        oneSecData[j].data.t_char = info->data.t_char;
+                    }else{
+                        // 处理需要累加的项
+                        switch(navData->value(j).type){
+                            case EnumClass::t_char:
+                                oneSecData[j].data.t_char += info->data.t_char;
+                                break;
+                            case EnumClass::t_uchar:
+                                oneSecData[j].data.t_uchar += info->data.t_uchar;
+                                break;
+                            case EnumClass::t_short:
+                                oneSecData[j].data.t_short += info->data.t_short;
+                                break;
+                            case EnumClass::t_ushort:
+                                oneSecData[j].data.t_ushort += info->data.t_ushort;
+                                break;
+                            case EnumClass::t_int:
+                                oneSecData[j].data.t_int += info->data.t_int;
+                                break;
+                            case EnumClass::t_uint:
+                                oneSecData[j].data.t_uint += info->data.t_uint;
+                                break;
+                            case EnumClass::t_float:
+                                oneSecData[j].data.t_float += info->data.t_float;
+                                break;
+                            case EnumClass::t_double:
+                                oneSecData[j].data.t_double += info->data.t_double;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                }
+
+                /*
+                if(dataCount%(freq*10)==0){
+                    tenSecData.push_back(parse.navData[j]);
+                }else{
+                    if(false){
+                        // 瞬时值
+                    }else{
+                        // todo: 处理需要累加的项
+                        tenSecData[j]+=navData->value(j);
+
+                    }
+                }
+                */
+
+            }
+
+
+            // 写入1s 10s 数据，并清除使之重新计算
+            if((dataCount+1)%frameHz==0){
+                parse.writeFile(f1sFile.ostrm, &oneSecData);
+                oneSecData.clear();
+            }
+            /*
+            if((dataCount+1)%(frameHz*10)==0){
+                // 10s有个特殊过程，求之前数据累加和的平均
+                for(unsigned int k=0; k<range.size(); k++){
+                       parse.tenSecData[index]/=10.0;
+                }
+                parse.writeFile(&tenSecFile, parse.tenSecData, false);
+                //if(!tenHeader) tenHeader = true;
+
+                parse.tenSecData.clear();
+            }
+            */
+
+
+
+
+            // 接收数据+1
+            dataCount++;
         }
     }
 

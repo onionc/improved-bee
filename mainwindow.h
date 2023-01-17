@@ -58,6 +58,10 @@ private:
     Parse parse;
     QVector<SProperty> frameData; // 协议
     QByteArray recvBuf; // 接收的字节数据
+    QVector<NAV_Data> oneSecData; // 1s的数据
+    QVector<NAV_Data> tenSecData; // 10s的数据
+    quint64 dataCount; // 计数
+
 
     // 存储文件
     bool bSaveRawFlag; // 原始数据标志
