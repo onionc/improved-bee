@@ -125,9 +125,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(serialPort, &SerialPort::signal_serialPortOpenState, this, &MainWindow::slot_serialPortOpenState); // 串口打开时状态
     connect(serialPort, &SerialPort::signal_serialPortCloseState, this, &MainWindow::slot_serialPortCloseState); // 串口关闭时状态
 
-    // 主线程定时器, 任务调度 10ms
+    // 主线程定时器, 任务调度 100ms
     runTimer = new QTimer(this);
-    runTimer->setInterval(10);  //10ms
+    runTimer->setInterval(100);  //100ms
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
 
@@ -655,6 +655,8 @@ void MainWindow::slot_taskScheduler(){
     const QVector<NAV_Data> *navData;
     QString ts;
     const NAV_Data *info;
+    bool flag1sUpdate=false, flag10sUpdate=false;
+
     while(recvBuf.size()>=parse.getFrameLen()){
         // 找并解析一帧数
         if(parse.findFrameAndParse(recvBuf)){
@@ -672,90 +674,104 @@ void MainWindow::slot_taskScheduler(){
                 // 累加1s数据
 
                 info = &(navData->at(j));
-                qDebug()<<"hz"<<frameHz;
+
+                // 1s 动态更新表格数据
+                if((dataCount+1)%frameHz==0){
+                    showTableWidget->item(j, 0)->setText(info->getDataStr());
+                }
 
                 if(dataCount%frameHz==0){
                     // 第一次写入数据
                     oneSecData.push_back(*info);
 
-                    // 动态更新表格数据
-                    showTableWidget->item(j, 0)->setText(info->getDataStr());
+                    flag1sUpdate = false;
                 }else{
-                    // todo: 通过ui上勾选的项，区分瞬时项和累加项 (瞬时值如果用第一个数，这里也可以不进行赋值)
-                    if(false){
-                        // 瞬时值
-                        oneSecData[j].data.t_char = info->data.t_char;
-                    }else{
-                        // 处理需要累加的项
-                        switch(navData->value(j).type){
-                            case EnumClass::t_char:
-                                oneSecData[j].data.t_char += info->data.t_char;
-                                break;
-                            case EnumClass::t_uchar:
-                                oneSecData[j].data.t_uchar += info->data.t_uchar;
-                                break;
-                            case EnumClass::t_short:
-                                oneSecData[j].data.t_short += info->data.t_short;
-                                break;
-                            case EnumClass::t_ushort:
-                                oneSecData[j].data.t_ushort += info->data.t_ushort;
-                                break;
-                            case EnumClass::t_int:
-                                oneSecData[j].data.t_int += info->data.t_int;
-                                break;
-                            case EnumClass::t_uint:
-                                oneSecData[j].data.t_uint += info->data.t_uint;
-                                break;
-                            case EnumClass::t_float:
-                                oneSecData[j].data.t_float += info->data.t_float;
-                                break;
-                            case EnumClass::t_double:
-                                oneSecData[j].data.t_double += info->data.t_double;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
+                    flag1sUpdate = true;
                 }
 
-                /*
-                if(dataCount%(freq*10)==0){
-                    tenSecData.push_back(parse.navData[j]);
-                }else{
-                    if(false){
-                        // 瞬时值
-                    }else{
-                        // todo: 处理需要累加的项
-                        tenSecData[j]+=navData->value(j);
 
+                if(dataCount%(frameHz*10)==0){
+                    tenSecData.push_back(*info);
+                    flag1sUpdate = false;
+                }else{
+                    flag10sUpdate = true;
+                }
+
+                // todo: 通过ui上勾选的项，区分瞬时项和累加项 (瞬时值如果用第一个数，这里也可以不进行赋值)
+                if(false){
+                    // 瞬时值
+                    // oneSecData[j].data.t_char = info->data.t_char;
+                }else{
+                    // todo: 处理需要累加的项
+                    switch(navData->value(j).type){
+                        case EnumClass::t_char:
+                            if(flag1sUpdate)  oneSecData[j].data.t_char += info->data.t_char;
+                            if(flag10sUpdate) tenSecData[j].data.t_char += info->data.t_char;
+
+                            // 10s有个特殊过程，求之前数据累加和的平均
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_char/=10;
+                            break;
+                        case EnumClass::t_uchar:
+                            if(flag1sUpdate)  oneSecData[j].data.t_uchar += info->data.t_uchar;
+                            if(flag10sUpdate) tenSecData[j].data.t_uchar += info->data.t_uchar;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_uchar/=10;
+                            break;
+                        case EnumClass::t_short:
+                            if(flag1sUpdate)  oneSecData[j].data.t_short += info->data.t_short;
+                            if(flag10sUpdate) tenSecData[j].data.t_short += info->data.t_short;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_short/=10;
+                            break;
+                        case EnumClass::t_ushort:
+                            if(flag1sUpdate)  oneSecData[j].data.t_ushort += info->data.t_ushort;
+                            if(flag10sUpdate) tenSecData[j].data.t_ushort += info->data.t_ushort;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_ushort/=10;
+                            break;
+                        case EnumClass::t_int:
+                            if(flag1sUpdate)  oneSecData[j].data.t_int += info->data.t_int;
+                            if(flag10sUpdate) tenSecData[j].data.t_int += info->data.t_int;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_int/=10;
+                            break;
+                        case EnumClass::t_uint:
+                            if(flag1sUpdate)  oneSecData[j].data.t_uint += info->data.t_uint;
+                            if(flag10sUpdate) tenSecData[j].data.t_uint += info->data.t_uint;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_uint/=10;
+                            break;
+                        case EnumClass::t_float:
+                            if(flag1sUpdate)  oneSecData[j].data.t_float += info->data.t_float;
+                            if(flag10sUpdate) tenSecData[j].data.t_float += info->data.t_float;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_float/=10;
+                            break;
+                        case EnumClass::t_double:
+                            if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_double;
+                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_double;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
+                            break;
+                        default:
+                            break;
                     }
                 }
-                */
+
 
             }
 
 
             // 写入1s 10s 数据，并清除使之重新计算
-            if((dataCount+1)%frameHz==0){
+            if( bSave1sFlag  && (dataCount+1)%frameHz==0){
                 parse.writeFile(f1sFile.ostrm, &oneSecData);
                 oneSecData.clear();
             }
-            /*
-            if((dataCount+1)%(frameHz*10)==0){
-                // 10s有个特殊过程，求之前数据累加和的平均
-                for(unsigned int k=0; k<range.size(); k++){
-                       parse.tenSecData[index]/=10.0;
-                }
-                parse.writeFile(&tenSecFile, parse.tenSecData, false);
-                //if(!tenHeader) tenHeader = true;
 
-                parse.tenSecData.clear();
+            if( bSave10sFlag && (dataCount+1)%(frameHz*10)==0){
+                parse.writeFile(f10sFile.ostrm, &tenSecData);
+                tenSecData.clear();
             }
-            */
-
-
-
 
             // 接收数据+1
             dataCount++;
