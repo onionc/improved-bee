@@ -17,6 +17,7 @@
 #include "serialPort/serialcombox.h"
 #include "parse.h"
 #include "datatype.h"
+#include "lua/lua.hpp"
 
 namespace Ui {
 class MainWindow;

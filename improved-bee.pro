@@ -58,5 +58,9 @@ RESOURCES += \
 INCLUDEPATH += include
 
 
+LIBS += ./liblualib.a
+
+
+
 #debug
 QMAKE_CXXFLAGS_DEBUG += -gstabs+
