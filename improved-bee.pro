@@ -58,7 +58,7 @@ RESOURCES += \
 INCLUDEPATH += include
 
 
-LIBS += ./liblualib.a
+LIBS += ./include/lua/liblualib.a
 
 
 
