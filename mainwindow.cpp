@@ -219,14 +219,22 @@ void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, 
 
 
     // 数据
-    if(name == FRAME_CHECK){
+    if(name == FRAME_HEADER){
+        // 帧头，默认lineEdit
+        item = new QTableWidgetItem(data, typeValue++);
+        ui->tableWidget->setItem(curRow, colData, item);
+    }else if(name == FRAME_CHECK){
+        // 校验，下拉选择
         QComboBox *classBox = new QComboBox;
         classBox->addItems(checkSumList);
         classBox->setCurrentText(data);
         ui->tableWidget->setCellWidget(curRow, colData, classBox);
     }else{
-        item = new QTableWidgetItem(data, typeValue++);
-        ui->tableWidget->setItem(curRow, colData, item);
+        // 多行输入框，用来输入数据或LUA脚本
+        QTextEdit *edit = new QTextEdit;
+        edit->setSizeIncrement(100, 50);
+        edit->setText(data);
+        ui->tableWidget->setCellWidget(curRow, colData, edit);
     }
 
     // 绘图1
@@ -321,12 +329,15 @@ void MainWindow::frameFormat(){
 
         info.name = ui->tableWidget->item(i, colName)->text();
         info.type = ui->tableWidget->item(i, colType)->text();
-        if(info.name==FRAME_CHECK){
+        if(info.name==FRAME_HEADER){
+            info.data = ui->tableWidget->item(i, colData)->text();
+        }else if(info.name==FRAME_CHECK){
             // 校验通过checkbox获取数据
             QComboBox *box = static_cast<QComboBox*>(ui->tableWidget->cellWidget(i, colData));
             info.data = box->currentText();
         }else{
-            info.data = ui->tableWidget->item(i, colData)->text();
+            QTextEdit *edit = static_cast<QTextEdit*>(ui->tableWidget->cellWidget(i, colData));
+            info.data = edit->toPlainText();
         }
 
         // 图表绘图项是否选定
