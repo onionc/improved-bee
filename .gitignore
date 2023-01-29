@@ -39,6 +39,7 @@ target_wrapper.*
 # QtCreator
 *.autosave
 debug/
+release/
 
 # QtCreator Qml
 *.qmlproject.user
@@ -56,3 +57,7 @@ compile_commands.json
 
 # vscode
 .vscode/
+
+# run generate
+log/
+config/

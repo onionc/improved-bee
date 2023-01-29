@@ -325,19 +325,25 @@ void MainWindow::frameFormat(){
         // 是否选定
         info.checked = ui->tableWidget->item(i, colName)->checkState()==Qt::Checked;
 
-        // 名称、类型、数据
-
+        // 名称、类型
         info.name = ui->tableWidget->item(i, colName)->text();
         info.type = ui->tableWidget->item(i, colType)->text();
+
+        // 数据
         if(info.name==FRAME_HEADER){
+            // 帧头
             info.data = ui->tableWidget->item(i, colData)->text();
         }else if(info.name==FRAME_CHECK){
             // 校验通过checkbox获取数据
             QComboBox *box = static_cast<QComboBox*>(ui->tableWidget->cellWidget(i, colData));
             info.data = box->currentText();
         }else{
+            // 脚本
             QTextEdit *edit = static_cast<QTextEdit*>(ui->tableWidget->cellWidget(i, colData));
             info.data = edit->toPlainText();
+            if(!info.data.isEmpty()){
+                luaScirpt.addFunc(info.data, 4); // todo:  长度未定
+            }
         }
 
         // 图表绘图项是否选定
@@ -466,7 +472,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
 
 
-        // 设置显示的表格数据
+        // 设置显示数据用的表格
         QStringList headerText;
         for(int i=0; i<parse.getNavData()->size(); i++){
             headerText << parse.getNavData()->value(i).name;

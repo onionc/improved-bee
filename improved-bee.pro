@@ -35,7 +35,8 @@ SOURCES += \
     ui/comboboxdelegate.cpp \
     ui/tablewidgetdrag.cpp \
     ui/ledlabel.cpp \
-    parse.cpp
+    parse.cpp \
+    luaScript/LuaScript.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     ui/comboboxdelegate.h \
     ui/tablewidgetdrag.h \
     ui/ledlabel.h \
-    parse.h
+    parse.h \
+    luaScript/LuaScript.h
 
 FORMS += \
         mainwindow.ui
