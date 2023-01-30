@@ -6,23 +6,37 @@ int LuaScript::funcIndex = 0;
 LuaScript::LuaScript()
 {
     scriptStr = "";
+
+    // lua 初始化
+    luaState = luaL_newstate(); // open
+    luaL_openlibs(luaState);
 }
 
-QString LuaScript::addFunc(QString funcStr, int paramCount){
-    if(paramCount<1 || paramCount>255) return "";
+QString LuaScript::addFunc(QString funcStr){
     QString funcName=QString("func_%1").arg(funcIndex++);
-    QString paramStr = "";
-    while(paramCount--){
-        paramStr += QString("p%1").arg(paramCount);
-        paramStr += " ,"[paramCount>0]; // 学的一个奇技淫巧
-    }
+
     QString t = QString(R"(
-function %1(%2)
+function %1(...)
+    local arr={...}
+    if #arr<1 then
+        return nil
+    end
+
+    data = arr[1] --计算好的数据
+    -- arr[2]~. 原始数据，需要 0xff 再运算
     %3
 end
-)").arg(funcName).arg(paramStr).arg(funcStr);
+)").arg(funcName).arg(funcStr);
 
-    PLOGD<<t;
+
+qDebug()<<t;
+PLOGD<<t;
+
+    if(luaL_dostring(luaState, t.toStdString().c_str())){
+        qDebug()<<"script check failed";
+        return "";
+    }
+
     scriptStr+=t;
     return funcName;
 }

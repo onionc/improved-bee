@@ -74,6 +74,7 @@ namespace DATA{
         bool curve1;
         bool curve2;
         bool curve3;
+
     }SProperty;
     // 数据 每一项的结构体
     typedef struct NAV_Data_Struct{
@@ -83,6 +84,12 @@ namespace DATA{
         QByteArray buf; // 数组
         // 数据
         typeUnion data;
+        // 函数名
+        QString funcName;
+        NAV_Data_Struct(){
+            funcName = "";
+        }
+
 
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
         const QString getDataStr() const{

@@ -6,21 +6,27 @@
 
 #include <QString>
 #include <QDebug>
+#include <lua/lua.hpp>
 
 class LuaScript
 {
     static int funcIndex; // 函数计数
     QString scriptStr; // 脚本字符串
+    // lua
+    lua_State* luaState;
+
 public:
     LuaScript();
+
+    // 清除函数
+    void clearFunc(){scriptStr="";}
 
     /**
      * @brief addFunc 新增函数
      * @param funcStr 函数体字符串
-     * @param paramCount 参数个数
      * @return  返回函数名
      */
-    QString addFunc(QString funcStr, int paramCount);
+    QString addFunc(QString funcStr);
 
     /**
      * @brief runFunc 调用函数

@@ -57,10 +57,10 @@ FORMS += \
 RESOURCES += \
     res.qrc
 
-INCLUDEPATH += include
+INCLUDEPATH += $$PWD/include
 
 
-LIBS += ./include/lua/liblualib.a
+LIBS += $$INCLUDEPATH/lua/liblualib.a
 
 
 

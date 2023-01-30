@@ -79,6 +79,8 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
     frameHeaderArr.clear();
     frameDataArr.clear();
 
+    luaScirpt.clearFunc();
+
     QString lastName = "";
     for(int i=0; i<frameInfoData->size(); i++){
         const SProperty *info = &frameInfoData->at(i);
@@ -176,6 +178,11 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                     break;
             }
 
+            // 是否有脚本
+            if(!info->data.isEmpty()){
+                nav.funcName = luaScirpt.addFunc(info->data);
+            }
+
             frameDataArr.push_back(nav);
         }
 
@@ -262,7 +269,7 @@ bool Parse::findFrameAndParse(QByteArray &allBytes){
         }
     }
 
-    // 解析数据，只需要数据，不要帧头和校验
+    // 解析数据，（只需要数据部分，不要帧头和校验）
     bool r = parseFrameData(frameBytesData);
     allBytes.remove(0, startIndex+frameLen);
 
@@ -369,6 +376,9 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
         switch(nav->type){
             case EnumClass::t_char:
                 nav->data.t_char = qint8(*dp);
+                if(!nav->funcName.isEmpty()){
+                    //luaScirpt.runFunc(nav->funcName, );
+                }
                 break;
             case EnumClass::t_uchar:
                 nav->data.t_uchar = quint8(*dp);

@@ -17,8 +17,7 @@
 #include "serialPort/serialcombox.h"
 #include "parse.h"
 #include "datatype.h"
-#include "lua/lua.hpp"
-#include "luaScript/LuaScript.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -77,8 +76,6 @@ private:
 
     void LogShow(QString info, bool format=true); // 显示日志
 
-    // lua脚本
-    LuaScript luaScirpt;
 
 
 private slots:

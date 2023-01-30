@@ -132,7 +132,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
 
-
     // 图像相关
     ui->led->setSize(15);
     ui->led->setColor(0); // 设定LED为灰色
@@ -144,6 +143,7 @@ MainWindow::MainWindow(QWidget *parent) :
     bSaveRawFlag = bSave1sFlag = bSave10sFlag = false;
 
 
+    /*
     // lua 测试
     lua_State* l = luaL_newstate(); // open
     luaL_openlibs(l);
@@ -169,6 +169,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }else{
         qDebug()<<"load file error";
     }
+    */
 
 
 }
@@ -320,6 +321,7 @@ void MainWindow::on_addCheckSumBtn_clicked()
 // 协议格式化，从table获取数据转为vector
 void MainWindow::frameFormat(){
     frameData.clear();
+
     for(int i=0; i<ui->tableWidget->rowCount(); i++) {
         SProperty info;
         // 是否选定
@@ -341,9 +343,6 @@ void MainWindow::frameFormat(){
             // 脚本
             QTextEdit *edit = static_cast<QTextEdit*>(ui->tableWidget->cellWidget(i, colData));
             info.data = edit->toPlainText();
-            if(!info.data.isEmpty()){
-                luaScirpt.addFunc(info.data, 4); // todo:  长度未定
-            }
         }
 
         // 图表绘图项是否选定

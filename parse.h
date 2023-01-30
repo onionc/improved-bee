@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include "util.h"
+#include "luaScript/LuaScript.h"
 
 using namespace DATA;
 
@@ -67,6 +68,11 @@ private:
     quint16 frameHeaderLen=0; // 帧头字节长度
     quint16 frameDataLen=0; // 数据字节长度
     quint16 frameCheckLen=0; // 校验字节长度
+
+
+
+    // lua脚本
+    LuaScript luaScirpt;
 
 };
 
