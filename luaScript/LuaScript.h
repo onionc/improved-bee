@@ -42,6 +42,8 @@ public:
      */
     bool runFunc(QString funcName, int data, const unsigned char* arr, size_t size, double &result);
     bool runFunc(QString funcName, double data, const unsigned char* arr, size_t size, double &result);
+    // runFunc公共方法。通过 type==1|2 来调用 data=int/double的runFunc函数
+    bool runFuncCommon(QString funcName, char type, int iData, double dData, const unsigned char* arr, size_t size, double &result);
 };
 
 #endif // LUASCRIPT_H

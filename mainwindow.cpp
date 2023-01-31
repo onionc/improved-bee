@@ -142,36 +142,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // 文件
     bSaveRawFlag = bSave1sFlag = bSave10sFlag = false;
 
-
-    /*
-    // lua 测试
-    lua_State* l = luaL_newstate(); // open
-    luaL_openlibs(l);
-    // 加载 lua file
-    if(!luaL_loadfile(l, "./luaScript/test.lua")){
-        // 运行
-        if (!lua_pcall(l, 0, 0, 0)) {
-            // 读取函数
-            lua_getglobal(l, "addE");
-            lua_pushnumber(l, 11);
-            lua_pushnumber(l, 2);
-            if(!lua_pcall(l, 2, 1, 0)){
-                if(lua_isnumber(l, -1)){
-                    qDebug()<<"addE(11,2)="<<lua_tonumber(l, -1);
-                }
-            }else{
-                qDebug()<<"error";
-            }
-
-        }else{
-            qDebug()<<"pcall error";
-        }
-    }else{
-        qDebug()<<"load file error";
-    }
-    */
-
-
 }
 
 MainWindow::~MainWindow()

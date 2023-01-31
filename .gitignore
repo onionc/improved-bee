@@ -60,4 +60,4 @@ compile_commands.json
 
 # run generate
 log/
-config/
+data/
