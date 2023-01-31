@@ -3,6 +3,8 @@
 
 int LuaScript::funcIndex = 0;
 
+
+
 LuaScript::LuaScript()
 {
     scriptStr = "";
@@ -10,6 +12,12 @@ LuaScript::LuaScript()
     // lua 初始化
     luaState = luaL_newstate(); // open
     luaL_openlibs(luaState);
+}
+
+// 加载脚本
+bool LuaScript::load(){
+    PLOGD<<scriptStr;
+    return luaL_dostring(luaState, scriptStr.toStdString().c_str())==0;
 }
 
 QString LuaScript::addFunc(QString funcStr){
@@ -29,8 +37,7 @@ end
 )").arg(funcName).arg(funcStr);
 
 
-qDebug()<<t;
-PLOGD<<t;
+//PLOGD<<t;
 
     if(luaL_dostring(luaState, t.toStdString().c_str())){
         qDebug()<<"script check failed";
@@ -41,6 +48,9 @@ PLOGD<<t;
     return funcName;
 }
 
-bool LuaScript::runFunc(QString funcName, QByteArray param){
-    return true;
+bool LuaScript::runFunc(QString funcName, int data, const unsigned char* arr, size_t size, double &result){
+    return 0;
+}
+bool LuaScript::runFunc(QString funcName, double data, const unsigned char* arr, size_t size, double &result){
+    return 0;
 }

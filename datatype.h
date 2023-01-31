@@ -86,11 +86,15 @@ namespace DATA{
         typeUnion data;
         // 函数名
         QString funcName;
+
+        // 是否为扩展值，true：表示协议有其他计算并调用脚本执行成功，用t_double值；false: 表示对应原始type的值
+        bool extValue;
+
+
         NAV_Data_Struct(){
             funcName = "";
+            extValue = false;
         }
-
-
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
         const QString getDataStr() const{
             QString s;

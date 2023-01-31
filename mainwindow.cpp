@@ -702,6 +702,7 @@ void MainWindow::slot_taskScheduler(){
     QString ts;
     const NAV_Data *info;
     bool flag1sUpdate=false, flag10sUpdate=false;
+    EnumClass::typeListEnum typeTmp;
 
     while(recvBuf.size()>=parse.getFrameLen()){
         // 找并解析一帧数
@@ -749,7 +750,10 @@ void MainWindow::slot_taskScheduler(){
                     // oneSecData[j].data.t_char = info->data.t_char;
                 }else{
                     // todo: 处理需要累加的项
-                    switch(navData->value(j).type){
+
+
+                    typeTmp = info->extValue ? EnumClass::t_double : info->type; // 扩展数据使用double类型数据
+                    switch(typeTmp){
                         case EnumClass::t_char:
                             if(flag1sUpdate)  oneSecData[j].data.t_char += info->data.t_char;
                             if(flag10sUpdate) tenSecData[j].data.t_char += info->data.t_char;

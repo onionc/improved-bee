@@ -20,6 +20,8 @@ public:
 
     // 清除函数
     void clearFunc(){scriptStr="";}
+    // 加载脚本
+    bool load();
 
     /**
      * @brief addFunc 新增函数
@@ -28,13 +30,18 @@ public:
      */
     QString addFunc(QString funcStr);
 
+
     /**
      * @brief runFunc 调用函数
      * @param funcName 函数名
-     * @param param Byte数组参数
-     * @return 返回执行与否，todo: 返回值待定
+     * @param data 数据值 int/double
+     * @param arr 数组
+     * @param size 长度
+     * @param result 结果值
+     * @return 执行成功与否
      */
-    bool runFunc(QString funcName, QByteArray param);
+    bool runFunc(QString funcName, int data, const unsigned char* arr, size_t size, double &result);
+    bool runFunc(QString funcName, double data, const unsigned char* arr, size_t size, double &result);
 };
 
 #endif // LUASCRIPT_H

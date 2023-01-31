@@ -79,7 +79,8 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
     frameHeaderArr.clear();
     frameDataArr.clear();
 
-    luaScirpt.clearFunc();
+
+    luaScirpt.clearFunc(); // lua 清空函数
 
     QString lastName = "";
     for(int i=0; i<frameInfoData->size(); i++){
@@ -181,6 +182,10 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
             // 是否有脚本
             if(!info->data.isEmpty()){
                 nav.funcName = luaScirpt.addFunc(info->data);
+                if(nav.funcName.isEmpty()){
+                    errorMsg = QString("脚本错误");
+                    return false;
+                }
             }
 
             frameDataArr.push_back(nav);
@@ -194,6 +199,12 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
 
     if(frameHeaderLen<=0 || frameDataLen<=0){
         errorMsg = QString("必须有帧头和数据");
+        return false;
+    }
+
+    // lua 加载脚本
+    if(!luaScirpt.load()){
+        errorMsg = QString("脚本加载错误");
         return false;
     }
 
@@ -367,6 +378,7 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
 
 
     quint8 * dp;
+    double result;
     // 遍历数据项
     for(int i=0; i<frameDataArr.size(); i++){
         nav = &frameDataArr[i];
@@ -377,29 +389,74 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
             case EnumClass::t_char:
                 nav->data.t_char = qint8(*dp);
                 if(!nav->funcName.isEmpty()){
-                    //luaScirpt.runFunc(nav->funcName, );
+                    if(luaScirpt.runFunc(nav->funcName, nav->data.t_char, dp, 1, result)){
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
                 }
                 break;
             case EnumClass::t_uchar:
                 nav->data.t_uchar = quint8(*dp);
+                if(!nav->funcName.isEmpty()){
+                    if(luaScirpt.runFunc(nav->funcName, nav->data.t_uchar, dp, 1, result)){
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
+                }
                 break;
             case EnumClass::t_short:
                 nav->data.t_short = util::bytes2short(dp);
+                if(!nav->funcName.isEmpty()){
+                    if(luaScirpt.runFunc(nav->funcName, nav->data.t_short, dp, 2, result)){
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
+                }
                 break;
             case EnumClass::t_ushort:
                 nav->data.t_ushort = util::bytes2ushort(dp);
+                if(!nav->funcName.isEmpty()){
+                    if(luaScirpt.runFunc(nav->funcName, nav->data.t_ushort, dp, 2, result)){
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
+                }
                 break;
             case EnumClass::t_int:
                 nav->data.t_int = util::bytes2int(dp);
+                if(!nav->funcName.isEmpty()){
+                    if(luaScirpt.runFunc(nav->funcName, nav->data.t_int, dp, 4, result)){
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
+                }
                 break;
             case EnumClass::t_uint:
                 nav->data.t_uint = util::bytes2uint(dp);
+                if(!nav->funcName.isEmpty()){
+                    if(luaScirpt.runFunc(nav->funcName, (double)nav->data.t_uint, dp, 4, result)){ // uint 处理较少，不专门处理，直接传给double
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
+                }
                 break;
             case EnumClass::t_float:
                 nav->data.t_float = util::bytes2float(dp);
+                if(!nav->funcName.isEmpty()){
+                     if(luaScirpt.runFunc(nav->funcName, nav->data.t_float, dp, 4, result)){
+                         nav->data.t_double = result;
+                         nav->extValue = true;
+                     }
+                }
                 break;
             case EnumClass::t_double:
                 nav->data.t_double = util::bytes2double(dp);
+                if(!nav->funcName.isEmpty()){
+                    if(luaScirpt.runFunc(nav->funcName, nav->data.t_double, dp, 8, result)){
+                        nav->data.t_double = result;
+                        nav->extValue = true;
+                    }
+                }
                 break;
             default:
                 PLOGD<<"类型错误";
