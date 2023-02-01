@@ -17,18 +17,19 @@ void Parse::writeToIni(const QVector<SProperty> *data, QString saveFilename){
 
     for(int i=0; i<data->size(); i++){
         const SProperty *info = &data->at(i);
+        QString keyName = QString("Data_%1").arg(i,4,10,QLatin1Char('0')); // 四位数字填充0，为了在读取的时候顺序一致
         // 是否选定
-        write.setValue(QString("Data_%1/checked").arg(i), info->checked);
+        write.setValue(QString("%1/checked").arg(keyName), info->checked);
 
         // 名称、类型、数据
-        write.setValue(QString("Data_%1/name").arg(i), info->name);
-        write.setValue(QString("Data_%1/type").arg(i), info->type);
-        write.setValue(QString("Data_%1/data").arg(i), info->data);
+        write.setValue(QString("%1/name").arg(keyName), info->name);
+        write.setValue(QString("%1/type").arg(keyName), info->type);
+        write.setValue(QString("%1/data").arg(keyName), info->data);
 
         // 图表绘图项是否选定
-        write.setValue(QString("Data_%1/curve1").arg(i), info->curve1);
-        write.setValue(QString("Data_%1/curve2").arg(i), info->curve2);
-        write.setValue(QString("Data_%1/curve3").arg(i), info->curve3);
+        write.setValue(QString("%1/curve1").arg(keyName), info->curve1);
+        write.setValue(QString("%1/curve2").arg(keyName), info->curve2);
+        write.setValue(QString("%1/curve3").arg(keyName), info->curve3);
     }
 }
 
@@ -38,10 +39,12 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
     // 打开ini文件
     data->clear();
     QSettings read(readFilename, QSettings::IniFormat);
+    read.setIniCodec(QTextCodec::codecForName("UTF-8"));
     QStringList allGroups = read.childGroups();
     data->clear();
     foreach(QString groupKey, allGroups){
         if(groupKey.startsWith("Data")){
+            qDebug()<<groupKey;
             // Data开头的为协议
             SProperty info;
             info.name = read.value(QString("%1/name").arg(groupKey)).toString();
@@ -391,8 +394,10 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
                 if(!nav->funcName.isEmpty()){
                     if(luaScirpt.runFunc(nav->funcName, nav->data.t_char, dp, 1, result)){
                         nav->data.t_double = result;
-                        nav->extValue = true;
+                    }else{
+                        nav->data.t_double = nav->data.t_char;
                     }
+                    nav->extValue = true; // 只要有funcName,
                 }
                 break;
             case EnumClass::t_uchar:
