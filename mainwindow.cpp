@@ -440,6 +440,9 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
             return;
         }
 
+        // 帧长显示
+        ui->frameLenlabel->setText(QString("%1").arg(parse.getFrameLen()));
+
         util::smallEndian = frameLittleEndian; // 字节序赋值
 
         // 设置界面
@@ -463,7 +466,6 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         for(int i=0; i<parse.getNavData()->size(); i++){
             showTableWidget->setItem(i, 0,new QTableWidgetItem());
         }
-
 
         // 切换表格
         switchTable(false);
