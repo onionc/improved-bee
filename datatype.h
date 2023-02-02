@@ -64,16 +64,16 @@ namespace DATA{
     extern const char* FRAME_CHECK;
 
     // 协议字段
-    enum FieldColumn{colName=0, colType, colData, colCurve1, colCurve2, colCurve3};
+    enum FieldColumn{colName=0, colType, colData, colAccumCheck, colCurve1, colCurve2, colCurve3};
     // 协议信息 每一项（属性）的结构体
     typedef struct SProperty_Struct{
         QString name;
         QString type;
         QString data;
-        bool checked;
-        bool curve1;
-        bool curve2;
-        bool curve3;
+        bool accumCheck=false; // 累加值
+        bool curve1=false;
+        bool curve2=false;
+        bool curve3=false;
 
     }SProperty;
     // 数据 每一项的结构体
@@ -84,21 +84,16 @@ namespace DATA{
         QByteArray buf; // 数组
         // 数据
         typeUnion data;
-        // 函数名
-        QString funcName;
+        // 函数名，函数不为空则取值为扩展值（表示协议有其他计算过程并调用脚本计算，结果用t_double值），为空则表示不做特殊处理（使用对应原始type的值）
+        QString extFuncName = "";
 
-        // 是否为扩展值，true：表示协议有其他计算并调用脚本执行成功，用t_double值；false: 表示对应原始type的值
-        bool extValue;
+        // 是否为累加值，true：1s数据是求和），false：瞬时值
+        bool accumFlag = false;
 
-
-        NAV_Data_Struct(){
-            funcName = "";
-            extValue = false;
-        }
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
         const QString getDataStr() const{
             QString s;
-            if(extValue){
+            if(!extFuncName.isEmpty()){
                 s = QString("%1").arg(data.t_double);
             }else{
                 switch(type){

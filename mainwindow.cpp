@@ -12,17 +12,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 表格设置
     QStringList headerText;
-    headerText<<"名称"<<"数据类型"<<"数值"<<"图1"<<"图2"<<"图3";
+    headerText<<"名称"<<"数据类型"<<"数值"<<"累加"<<"图1"<<"图2"<<"图3";
     ui->tableWidget->setColumnCount(headerText.count()); // 列数
     ui->tableWidget->setHorizontalHeaderLabels(headerText); // 设置水平表头数据
     ui->tableWidget->horizontalHeader()->setVisible(true); // 水平表头有效
     ui->tableWidget->verticalHeader()->setVisible(true); // 竖直表头有效
     ui->tableWidget->setColumnWidth(colName, 140); // 列宽
-    ui->tableWidget->setColumnWidth(colType, 140); // 列宽
-    ui->tableWidget->setColumnWidth(colData, 140); // 列宽
-    ui->tableWidget->setColumnWidth(colCurve1, 40); // 列宽
-    ui->tableWidget->setColumnWidth(colCurve2, 40); // 列宽
-    ui->tableWidget->setColumnWidth(colCurve3, 40); // 列宽
+    ui->tableWidget->setColumnWidth(colType, 70);
+    ui->tableWidget->setColumnWidth(colData, 140);
+    ui->tableWidget->setColumnWidth(colAccumCheck, 40);
+    ui->tableWidget->setColumnWidth(colCurve1, 40);
+    ui->tableWidget->setColumnWidth(colCurve2, 40);
+    ui->tableWidget->setColumnWidth(colCurve3, 40);
     ui->tableWidget->setAlternatingRowColors(true); // 隔行换色
     ui->tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // 竖直滚动条
     ui->tableWidget->setItemDelegateForColumn(colType,&comboboxDelegate);   //委托
@@ -159,7 +160,7 @@ MainWindow::~MainWindow()
 
 
 // 表格新增一行
-void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, QString data, Qt::CheckState checked, Qt::CheckState curve1Checked, Qt::CheckState curve2Checked, Qt::CheckState curve3Checked){
+void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, QString data, Qt::CheckState accumCheck, Qt::CheckState curve1Checked, Qt::CheckState curve2Checked, Qt::CheckState curve3Checked){
     QTableWidgetItem *item;
 
     int typeValue = 1000; // type>=1000 自定义类型
@@ -170,9 +171,6 @@ void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, 
     if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
         // 特殊项名称不可编辑
         item->setFlags(item->flags() & (~Qt::ItemIsEditable));
-    }else{
-        // 可选定
-        item->setCheckState(checked);
     }
 
     // 数据类型
@@ -207,6 +205,19 @@ void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, 
         edit->setText(data);
         ui->tableWidget->setCellWidget(curRow, colData, edit);
     }
+
+    // 累加值选择框
+    item = new QTableWidgetItem("", typeValue++);
+    ui->tableWidget->setItem(curRow, colAccumCheck, item);
+    if(name == FRAME_HEADER || name == FRAME_END || name == FRAME_CHECK){
+        // 特殊项不可选择绘图
+        item->setFlags(Qt::NoItemFlags);
+    }else{
+        // 默认不选定
+        item->setCheckState(accumCheck);
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable & ~Qt::ItemIsSelectable);
+    }
+
 
     // 绘图1
     item = new QTableWidgetItem("", typeValue++);
@@ -294,8 +305,6 @@ void MainWindow::frameFormat(){
 
     for(int i=0; i<ui->tableWidget->rowCount(); i++) {
         SProperty info;
-        // 是否选定
-        info.checked = ui->tableWidget->item(i, colName)->checkState()==Qt::Checked;
 
         // 名称、类型
         info.name = ui->tableWidget->item(i, colName)->text();
@@ -314,6 +323,9 @@ void MainWindow::frameFormat(){
             QTextEdit *edit = static_cast<QTextEdit*>(ui->tableWidget->cellWidget(i, colData));
             info.data = edit->toPlainText();
         }
+
+        // 是否选定
+        info.accumCheck = ui->tableWidget->item(i, colAccumCheck)->checkState()==Qt::Checked;
 
         // 图表绘图项是否选定
         info.curve1 = ui->tableWidget->item(i, colCurve1)->checkState()==Qt::Checked;
@@ -384,7 +396,7 @@ void MainWindow::on_loadFrameBtn_clicked()
     // 显示到table
     QString name, data;
     int curRow = ui->tableWidget->rowCount();
-    Qt::CheckState line, curve1, curve2, curve3; // 选定状态：行选定（在第一个item下），图1，图2，图3
+    Qt::CheckState accumCheck, curve1, curve2, curve3; // 选定状态：累加标志，图1，图2，图3
     EnumClass::typeListEnum type;
 
     foreach (SProperty info, frameData) {
@@ -392,14 +404,14 @@ void MainWindow::on_loadFrameBtn_clicked()
         type = DATA::str2Type(info.type);
         data = info.data;
 
-        line = info.checked ? Qt::Checked : Qt::Unchecked;
+        accumCheck = info.accumCheck ? Qt::Checked : Qt::Unchecked;
         curve1 = info.curve1 ? Qt::Checked : Qt::Unchecked;
         curve2 = info.curve2 ? Qt::Checked : Qt::Unchecked;
         curve3 = info.curve3 ? Qt::Checked : Qt::Unchecked;
 
         // 插入一行
         ui->tableWidget->insertRow(curRow);
-        addRow(curRow, name, type, data, line, curve1, curve2, curve3);
+        addRow(curRow, name, type, data, accumCheck, curve1, curve2, curve3);
         curRow++;
     }
 
@@ -686,27 +698,19 @@ void MainWindow::slot_taskScheduler(){
 
             if(frameHz<=0) continue;
 
-            // 1s 10s数据
+            // 1s 10s 数据填充
             for(unsigned int j=0; j<navData->size(); j++){
-                // 累加1s数据
-
                 info = &(navData->at(j));
 
-                // 1s 动态更新表格数据
-                if((dataCount+1)%frameHz==0){
-                    showTableWidget->item(j, 0)->setText(info->getDataStr());
-                }
-
+                // 1s 计数判断
                 if(dataCount%frameHz==0){
-                    // 第一次写入数据
+                    // 每1s第一帧写入基础数据
                     oneSecData.push_back(*info);
-
                     flag1sUpdate = false;
                 }else{
                     flag1sUpdate = true;
                 }
-
-
+                // 10s 计数判断
                 if(dataCount%(frameHz*10)==0){
                     tenSecData.push_back(*info);
                     flag1sUpdate = false;
@@ -714,80 +718,123 @@ void MainWindow::slot_taskScheduler(){
                     flag10sUpdate = true;
                 }
 
-                // todo: 通过ui上勾选的项，区分瞬时项和累加项 (瞬时值如果用第一个数，这里也可以不进行赋值)
-                if(false){
-                    // 瞬时值
-                    // oneSecData[j].data.t_char = info->data.t_char;
-                }else{
-                    // todo: 处理需要累加的项
+                // 数据处理
+                typeTmp = info->extFuncName.isEmpty() ? info->type : EnumClass::t_double; // 扩展数据使用double类型数据
+                switch(typeTmp){
+                    case EnumClass::t_char:
+                        if(info->accumFlag){
+                            // 累加值
 
-
-                    typeTmp = info->extValue ? EnumClass::t_double : info->type; // 扩展数据使用double类型数据
-                    switch(typeTmp){
-                        case EnumClass::t_char:
+                            // 1s 10s 求和
                             if(flag1sUpdate)  oneSecData[j].data.t_char += info->data.t_char;
                             if(flag10sUpdate) tenSecData[j].data.t_char += info->data.t_char;
 
                             // 10s有个特殊过程，求之前数据累加和的平均
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_char/=10;
-                            break;
-                        case EnumClass::t_uchar:
+                        }else{
+                            // 瞬时值
+                            if(flag1sUpdate)  oneSecData[j].data.t_char = info->data.t_char;
+                            if(flag10sUpdate) tenSecData[j].data.t_char = info->data.t_char;
+                        }
+
+                        break;
+                    case EnumClass::t_uchar:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_uchar += info->data.t_uchar;
                             if(flag10sUpdate) tenSecData[j].data.t_uchar += info->data.t_uchar;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_uchar/=10;
-                            break;
-                        case EnumClass::t_short:
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_uchar = info->data.t_uchar;
+                            if(flag10sUpdate) tenSecData[j].data.t_uchar = info->data.t_uchar;
+                        }
+
+                        break;
+                    case EnumClass::t_short:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_short += info->data.t_short;
                             if(flag10sUpdate) tenSecData[j].data.t_short += info->data.t_short;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_short/=10;
-                            break;
-                        case EnumClass::t_ushort:
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_short = info->data.t_short;
+                            if(flag10sUpdate) tenSecData[j].data.t_short = info->data.t_short;
+                        }
+                        break;
+                    case EnumClass::t_ushort:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_ushort += info->data.t_ushort;
                             if(flag10sUpdate) tenSecData[j].data.t_ushort += info->data.t_ushort;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_ushort/=10;
-                            break;
-                        case EnumClass::t_int:
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_ushort = info->data.t_ushort;
+                            if(flag10sUpdate) tenSecData[j].data.t_ushort = info->data.t_ushort;
+                        }
+                        break;
+                    case EnumClass::t_int:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_int += info->data.t_int;
                             if(flag10sUpdate) tenSecData[j].data.t_int += info->data.t_int;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_int/=10;
-                            break;
-                        case EnumClass::t_uint:
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_int = info->data.t_int;
+                            if(flag10sUpdate) tenSecData[j].data.t_int = info->data.t_int;
+                        }
+                        break;
+                    case EnumClass::t_uint:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_uint += info->data.t_uint;
                             if(flag10sUpdate) tenSecData[j].data.t_uint += info->data.t_uint;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_uint/=10;
-                            break;
-                        case EnumClass::t_float:
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_uint = info->data.t_uint;
+                            if(flag10sUpdate) tenSecData[j].data.t_uint = info->data.t_uint;
+                        }
+                        break;
+                    case EnumClass::t_float:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_float += info->data.t_float;
                             if(flag10sUpdate) tenSecData[j].data.t_float += info->data.t_float;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_float/=10;
-                            break;
-                        case EnumClass::t_double:
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_float = info->data.t_float;
+                            if(flag10sUpdate) tenSecData[j].data.t_float = info->data.t_float;
+                        }
+                        break;
+                    case EnumClass::t_double:
+                        if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_double;
                             if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_double;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
-                            break;
-                        default:
-                            break;
-                    }
+                        }else{
+                            if(flag1sUpdate)  oneSecData[j].data.t_double = info->data.t_double;
+                            if(flag10sUpdate) tenSecData[j].data.t_double = info->data.t_double;
+                        }
+                        break;
+                    default:
+                        break;
                 }
 
 
+                // 1s 动态更新表格数据
+                if((dataCount+1)%frameHz==0){
+                    showTableWidget->item(j, 0)->setText(oneSecData[j].getDataStr());
+                }
             }
 
 
-            // 写入1s 10s 数据，并清除使之重新计算
-            if( bSave1sFlag  && (dataCount+1)%frameHz==0){
+            // 写入 1s 数据，并清除使之重新计算
+            if(bSave1sFlag && (dataCount+1)%frameHz==0){
                 parse.writeFile(f1sFile.ostrm, &oneSecData);
                 oneSecData.clear();
             }
 
+            // 写入 10s 数据
             if( bSave10sFlag && (dataCount+1)%(frameHz*10)==0){
                 parse.writeFile(f10sFile.ostrm, &tenSecData);
                 tenSecData.clear();
