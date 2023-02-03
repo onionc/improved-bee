@@ -137,6 +137,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->led->setSize(15);
     ui->led->setColor(0); // 设定LED为灰色
 
+    // 图形显示界面
+    plot = new Plot();
+    plot->show();
+
+
     // 协议未确认
     frameChecked = false;
 
@@ -273,6 +278,13 @@ void MainWindow::on_delRowBtn_clicked()
     ui->tableWidget->removeRow(ui->tableWidget->currentRow());
 
     ui->tableWidget->selectRow(ui->tableWidget->currentRow());
+
+    /* 删除所有行
+    int row = ui->tableWidget->rowCount();
+    for(int i=row-1; i>=0; i--){
+        ui->tableWidget->removeRow(i);
+    }
+    */
 }
 
 // 添加帧头

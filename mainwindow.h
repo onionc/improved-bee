@@ -17,6 +17,7 @@
 #include "serialPort/serialcombox.h"
 #include "parse.h"
 #include "datatype.h"
+#include "plot/plot.h"
 
 
 namespace Ui {
@@ -76,7 +77,8 @@ private:
 
     void LogShow(QString info, bool format=true); // 显示日志
 
-
+    // 图形显示
+    Plot *plot = nullptr;
 
 private slots:
     // ---- 数据协议 ----

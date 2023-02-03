@@ -277,7 +277,7 @@
           <number>1</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <property name="tabSpacing">
           <number>6</number>
@@ -909,6 +909,25 @@
           <attribute name="label">
            <string>功能选择</string>
           </attribute>
+          <widget class="QPushButton" name="pushButton">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>10</y>
+             <width>75</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>图形显示</string>
+           </property>
+          </widget>
          </widget>
         </widget>
        </item>

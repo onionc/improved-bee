@@ -5,7 +5,9 @@
 #-------------------------------------------------
 
 
-QT       += core gui serialport
+QT       += core gui \
+            serialport \
+            printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,7 +38,9 @@ SOURCES += \
     ui/tablewidgetdrag.cpp \
     ui/ledlabel.cpp \
     parse.cpp \
-    luaScript/LuaScript.cpp
+    luaScript/LuaScript.cpp \
+    plot/plot.cpp \
+    plot/qcustomplot.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,10 +53,13 @@ HEADERS += \
     ui/tablewidgetdrag.h \
     ui/ledlabel.h \
     parse.h \
-    luaScript/LuaScript.h
+    luaScript/LuaScript.h \
+    plot/plot.h \
+    plot/qcustomplot.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    plot/plot.ui
 
 RESOURCES += \
     res.qrc
