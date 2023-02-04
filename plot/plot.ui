@@ -15,13 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCustomPlot" name="widget" native="true"/>
+    <widget class="QCustomPlot" name="mPlot1" native="true"/>
    </item>
    <item>
-    <widget class="QCustomPlot" name="widget_2" native="true"/>
+    <widget class="QCustomPlot" name="mPlot2" native="true"/>
    </item>
    <item>
-    <widget class="QCustomPlot" name="widget_3" native="true"/>
+    <widget class="QCustomPlot" name="mPlot3" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="widget_4" native="true">
