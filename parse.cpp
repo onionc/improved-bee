@@ -82,10 +82,13 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
     frameHeaderArr.clear();
     frameDataArr.clear();
 
-
     luaScirpt.clearFunc(); // lua 清空函数
 
-    QString lastName = "";
+    QString lastName = ""; // 最后一个名称，用来判断多帧头
+
+    // 绘图项计数，每个图最多允许三条数据，其他忽略
+    int curve1Count=0, curve2Count=0, curve3Count=0;
+
     for(int i=0; i<frameInfoData->size(); i++){
         const SProperty *info = &frameInfoData->at(i);
 
@@ -193,6 +196,20 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
 
             // 累加标志
             nav.accumFlag = info->accumCheck;
+
+            // 绘图标志
+            if(info->curve1 && curve1Count<3){
+                curve1Count++;
+                nav.curve1Index = curve1Count;
+            }
+            if(info->curve2 && curve2Count<3){
+                curve2Count++;
+                nav.curve2Index = curve2Count;
+            }
+            if(info->curve3 && curve3Count<3){
+                curve3Count++;
+                nav.curve3Index = curve3Count;
+            }
 
             frameDataArr.push_back(nav);
         }

@@ -71,7 +71,7 @@ namespace DATA{
         QString type;
         QString data;
         bool accumCheck=false; // 累加值
-        bool curve1=false;
+        bool curve1=false; // 绘图到图形1
         bool curve2=false;
         bool curve3=false;
 
@@ -89,6 +89,11 @@ namespace DATA{
 
         // 是否为累加值，true：1s数据是求和），false：瞬时值
         bool accumFlag = false;
+
+        // 绘图，共三个图形框，每个图形下最多有三种数据
+        quint8 curve1Index = 0; // 从1开始（1~3），代表第几种数据
+        quint8 curve2Index = 0;
+        quint8 curve3Index = 0;
 
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
         const QString getDataStr() const{

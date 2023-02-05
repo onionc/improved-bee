@@ -33,6 +33,7 @@ public:
                       const QVector<double> &value1,
                       const QVector<double> &value2,
                       const QVector<double> &value3);
+    void plotAddData(int index, double key, double value1=0, double value2=0, double value3=0);
 private:
     Ui::Plot *ui;
 };

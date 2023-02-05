@@ -286,9 +286,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>185</width>
-            <height>206</height>
+            <y>-45</y>
+            <width>184</width>
+            <height>214</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -597,8 +597,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>185</width>
-            <height>206</height>
+            <width>179</width>
+            <height>212</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -899,7 +899,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>206</height>
+            <height>190</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -909,7 +909,7 @@
           <attribute name="label">
            <string>功能选择</string>
           </attribute>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="showPlotBtn">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -926,6 +926,9 @@
            </property>
            <property name="text">
             <string>图形显示</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </widget>

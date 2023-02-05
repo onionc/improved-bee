@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 图形显示界面
     plot = new Plot();
-    plot->show();
+    //plot->show();
 
 
     // 协议未确认
@@ -700,7 +700,11 @@ void MainWindow::slot_taskScheduler(){
     bool flag1sUpdate=false, flag10sUpdate=false;
     EnumClass::typeListEnum typeTmp;
 
+    // 绘图用变量
+    double key[3]={0}, cv1[3]={0}, cv2[3]={0}, cv3[3]={0};
+
     while(recvBuf.size()>=parse.getFrameLen()){
+
         // 找并解析一帧数
         if(parse.findFrameAndParse(recvBuf)){
             navData = parse.getNavData();
@@ -837,10 +841,33 @@ void MainWindow::slot_taskScheduler(){
 
                 // 1s 动态更新表格数据
                 if((dataCount+1)%frameHz==0){
+                    // 需要用到j, 所以放到for内
                     showTableWidget->item(j, 0)->setText(oneSecData[j].getDataStr());
                 }
+
+                // 绘图数据准备
+                if(info->curve1Index>=1 && info->curve1Index<=3){
+                    cv1[info->curve1Index] = info->getDataStr().toDouble();
+                }
+
+                if(info->curve2Index>=1 && info->curve2Index<=3){
+                    cv2[info->curve2Index] = info->getDataStr().toDouble();
+                }
+
+                if(info->curve3Index>=1 && info->curve3Index<=3){
+                    cv3[info->curve3Index] = info->getDataStr().toDouble();
+                }
+
+
             }
 
+
+            // 1s 绘图添加数据
+            if((dataCount+1)%frameHz==0){
+                plot->plotAddData(1, dataCount, cv1[0], cv1[1], cv1[2]);
+                plot->plotAddData(2, dataCount, cv2[0], cv2[1], cv2[2]);
+                plot->plotAddData(3, dataCount, cv3[0], cv3[1], cv3[2]);
+            }
 
             // 写入 1s 数据，并清除使之重新计算
             if(bSave1sFlag && (dataCount+1)%frameHz==0){
@@ -883,3 +910,19 @@ void MainWindow::LogShow(QString info, bool format){
 
 }
 
+
+
+
+void MainWindow::on_showPlotBtn_clicked(bool checked)
+{
+    if(checked){
+        // 显示绘图界面
+
+        // todo 清空数据等
+
+        plot->show();
+    }else{
+
+        plot->hide();
+    }
+}

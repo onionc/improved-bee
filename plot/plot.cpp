@@ -1,5 +1,6 @@
 #include "plot.h"
 #include "ui_plot.h"
+#include "plot/qcustomplot.h"
 
 Plot::Plot(QWidget *parent) :
     QWidget(parent),
@@ -66,4 +67,26 @@ void Plot::plotAddData(int index,
     if(!value3.isEmpty()){
         ui->mPlot1->graph(2)->addData(key, value3);
     }
+}
+
+void Plot::plotAddData(int index, double key, double value1, double value2, double value3){
+
+    if(index<1 || index>3){
+        return;
+    }
+    QCustomPlot *qplot;
+    if(index==1){
+        qplot = ui->mPlot1;
+    }else if(index==2){
+        qplot = ui->mPlot2;
+    }else if(index==3){
+        qplot = ui->mPlot3;
+    }
+    qplot->graph(0)->addData(key, value1);
+
+    qplot->graph(1)->addData(key, value2);
+
+    qplot->graph(2)->addData(key, value3);
+
+    qplot->replot();
 }
