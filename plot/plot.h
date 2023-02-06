@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QPen>
 #include <QVector>
+#include <QDebug>
 
 namespace Ui {
 class Plot;

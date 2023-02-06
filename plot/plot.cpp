@@ -21,6 +21,20 @@ Plot::Plot(QWidget *parent) :
     ui->mPlot1->addGraph();
     ui->mPlot1->graph(2)->setPen(QPen(Qt::gray));
 
+    // 坐标轴显示刻度
+    ui->mPlot1->yAxis->setTickLabels(true);
+    ui->mPlot1->xAxis->ticker()->setTickCount(10); // 刻度个数
+    // 设置显示曲线图例
+    ui->mPlot1->legend->setVisible(true);
+    ui->mPlot1->legend->setBrush(QColor(255,255,255,0)); // 图例背景设置透明
+    ui->mPlot1->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft); // 左上角
+    // 四边都有轴
+    ui->mPlot1->axisRect()->setupFullAxesBox();
+
+    // 设置交互模式：iRangeDrag轴范围拖动 iRangeZoom滚动放大 iSelectLegend图例可被选中 iSelectPlottables曲线可被选中
+    ui->mPlot1->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectLegend | QCP::iSelectPlottables | QCP::iSelectAxes);
+
+
     // ------------- 图形2 ------------------
     // 增加线条
     ui->mPlot2->addGraph();
@@ -30,6 +44,7 @@ Plot::Plot(QWidget *parent) :
     ui->mPlot2->addGraph();
     ui->mPlot2->graph(2)->setPen(QPen(Qt::gray));
 
+
     // ------------- 图形3 ------------------
     // 增加线条
     ui->mPlot3->addGraph();
@@ -38,6 +53,7 @@ Plot::Plot(QWidget *parent) :
     ui->mPlot3->graph(1)->setPen(QPen(Qt::blue));
     ui->mPlot3->addGraph();
     ui->mPlot3->graph(2)->setPen(QPen(Qt::gray));
+
 }
 
 Plot::~Plot()
@@ -88,5 +104,11 @@ void Plot::plotAddData(int index, double key, double value1, double value2, doub
 
     qplot->graph(2)->addData(key, value3);
 
-    qplot->replot();
+    // 自适应大小
+    qplot->rescaleAxes();
+    // 放大区间，使数据边界进入图形内
+    double dCenter = qplot->yAxis->range().center();
+    qplot->yAxis->scaleRange(1.2, dCenter);
+    // 重绘
+    qplot->replot(QCustomPlot::rpQueuedReplot);
 }
