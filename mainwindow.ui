@@ -286,9 +286,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-45</y>
-            <width>184</width>
-            <height>214</height>
+            <y>0</y>
+            <width>185</width>
+            <height>206</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -597,8 +597,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>179</width>
-            <height>212</height>
+            <width>185</width>
+            <height>206</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -899,7 +899,7 @@
             <x>0</x>
             <y>0</y>
             <width>185</width>
-            <height>190</height>
+            <height>206</height>
            </rect>
           </property>
           <attribute name="icon">
@@ -928,7 +928,7 @@
             <string>图形显示</string>
            </property>
            <property name="checkable">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </widget>

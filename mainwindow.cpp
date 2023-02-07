@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->horizontalHeader()->setVisible(true); // 水平表头有效
     ui->tableWidget->verticalHeader()->setVisible(true); // 竖直表头有效
     ui->tableWidget->setColumnWidth(colName, 140); // 列宽
-    ui->tableWidget->setColumnWidth(colType, 70);
+    ui->tableWidget->setColumnWidth(colType, 90);
     ui->tableWidget->setColumnWidth(colData, 140);
     ui->tableWidget->setColumnWidth(colAccumCheck, 40);
     ui->tableWidget->setColumnWidth(colCurve1, 40);
@@ -847,15 +847,15 @@ void MainWindow::slot_taskScheduler(){
 
                 // 绘图数据准备
                 if(info->curve1Index>=1 && info->curve1Index<=3){
-                    cv1[info->curve1Index] = info->getDataStr().toDouble();
+                    cv1[info->curve1Index-1] = info->getDataStr().toDouble();
                 }
 
                 if(info->curve2Index>=1 && info->curve2Index<=3){
-                    cv2[info->curve2Index] = info->getDataStr().toDouble();
+                    cv2[info->curve2Index-1] = info->getDataStr().toDouble();
                 }
 
                 if(info->curve3Index>=1 && info->curve3Index<=3){
-                    cv3[info->curve3Index] = info->getDataStr().toDouble();
+                    cv3[info->curve3Index-1] = info->getDataStr().toDouble();
                 }
 
 
@@ -911,11 +911,10 @@ void MainWindow::LogShow(QString info, bool format){
 }
 
 
-
-
-void MainWindow::on_showPlotBtn_clicked(bool checked)
+void MainWindow::on_showPlotBtn_clicked()
 {
-    if(checked){
+    bool hidden = plot->isHidden();
+    if(hidden){
         // 显示绘图界面
 
         // todo 清空数据等

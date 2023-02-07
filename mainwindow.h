@@ -114,7 +114,7 @@ private slots:
     void slot_taskScheduler();
 
     // 显示绘图界面按钮
-    void on_showPlotBtn_clicked(bool checked);
+    void on_showPlotBtn_clicked();
 
 signals:
     // 打开串口信号

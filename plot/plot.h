@@ -20,6 +20,8 @@ public:
     explicit Plot(QWidget *parent = 0);
     ~Plot();
 
+    // 初始化图形框 1~3
+    void initGraph(int index);
     //  index为图形索引
     /**
      * @brief plotAddData 图形增加数据

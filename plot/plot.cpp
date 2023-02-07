@@ -12,47 +12,10 @@ Plot::Plot(QWidget *parent) :
     // 主窗口关闭时，关闭子窗口
     setAttribute(Qt::WA_QuitOnClose, false);
 
-    // ------------- 图形1 ------------------
-    // 增加线条
-    ui->mPlot1->addGraph();
-    ui->mPlot1->graph(0)->setPen(QPen(Qt::red));
-    ui->mPlot1->addGraph();
-    ui->mPlot1->graph(1)->setPen(QPen(Qt::blue));
-    ui->mPlot1->addGraph();
-    ui->mPlot1->graph(2)->setPen(QPen(Qt::gray));
-
-    // 坐标轴显示刻度
-    ui->mPlot1->yAxis->setTickLabels(true);
-    ui->mPlot1->xAxis->ticker()->setTickCount(10); // 刻度个数
-    // 设置显示曲线图例
-    ui->mPlot1->legend->setVisible(true);
-    ui->mPlot1->legend->setBrush(QColor(255,255,255,0)); // 图例背景设置透明
-    ui->mPlot1->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft); // 左上角
-    // 四边都有轴
-    ui->mPlot1->axisRect()->setupFullAxesBox();
-
-    // 设置交互模式：iRangeDrag轴范围拖动 iRangeZoom滚动放大 iSelectLegend图例可被选中 iSelectPlottables曲线可被选中
-    ui->mPlot1->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectLegend | QCP::iSelectPlottables | QCP::iSelectAxes);
-
-
-    // ------------- 图形2 ------------------
-    // 增加线条
-    ui->mPlot2->addGraph();
-    ui->mPlot2->graph(0)->setPen(QPen(Qt::red));
-    ui->mPlot2->addGraph();
-    ui->mPlot2->graph(1)->setPen(QPen(Qt::blue));
-    ui->mPlot2->addGraph();
-    ui->mPlot2->graph(2)->setPen(QPen(Qt::gray));
-
-
-    // ------------- 图形3 ------------------
-    // 增加线条
-    ui->mPlot3->addGraph();
-    ui->mPlot3->graph(0)->setPen(QPen(Qt::red));
-    ui->mPlot3->addGraph();
-    ui->mPlot3->graph(1)->setPen(QPen(Qt::blue));
-    ui->mPlot3->addGraph();
-    ui->mPlot3->graph(2)->setPen(QPen(Qt::gray));
+    // 初始化图形1~3
+    initGraph(1);
+    initGraph(2);
+    initGraph(3);
 
 }
 
@@ -61,6 +24,41 @@ Plot::~Plot()
     delete ui;
 }
 
+void Plot::initGraph(int index){
+    if(index<1 || index>3){
+        return;
+    }
+    QCustomPlot *qplot;
+    if(index==1){
+        qplot = ui->mPlot1;
+    }else if(index==2){
+        qplot = ui->mPlot2;
+    }else if(index==3){
+        qplot = ui->mPlot3;
+    }
+
+    // 增加线条
+    qplot->addGraph();
+    qplot->graph(0)->setPen(QPen(Qt::red));
+    qplot->addGraph();
+    qplot->graph(1)->setPen(QPen(Qt::blue));
+    qplot->addGraph();
+    qplot->graph(2)->setPen(QPen(Qt::gray));
+
+    // 坐标轴显示刻度
+    qplot->yAxis->setTickLabels(true);
+    qplot->xAxis->ticker()->setTickCount(10); // 刻度个数
+    // 设置显示曲线图例
+    qplot->legend->setVisible(true);
+    qplot->legend->setBrush(QColor(255,255,255,0)); // 图例背景设置透明
+    qplot->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft); // 左上角
+    // 四边都有轴
+    qplot->axisRect()->setupFullAxesBox();
+
+    // 设置交互模式：iRangeDrag轴范围拖动 iRangeZoom滚动放大 iSelectLegend图例可被选中 iSelectPlottables曲线可被选中
+    qplot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectLegend | QCP::iSelectPlottables | QCP::iSelectAxes);
+
+}
 
 void Plot::plotAddData(int index,
                   const QVector<double> &key,
@@ -71,17 +69,25 @@ void Plot::plotAddData(int index,
     if(index<1 || index>3){
         return;
     }
+    QCustomPlot *qplot;
+    if(index==1){
+        qplot = ui->mPlot1;
+    }else if(index==2){
+        qplot = ui->mPlot2;
+    }else if(index==3){
+        qplot = ui->mPlot3;
+    }
 
     if(!value1.isEmpty()){
-        ui->mPlot1->graph(0)->addData(key, value1);
+        qplot->graph(0)->addData(key, value1);
     }
 
     if(!value2.isEmpty()){
-        ui->mPlot1->graph(1)->addData(key, value2);
+        qplot->graph(1)->addData(key, value2);
     }
 
     if(!value3.isEmpty()){
-        ui->mPlot1->graph(2)->addData(key, value3);
+        qplot->graph(2)->addData(key, value3);
     }
 }
 
