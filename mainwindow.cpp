@@ -641,6 +641,9 @@ void MainWindow::slot_serialPortOpenState(bool checked){
         tenSecData.clear();
         dataCount = 0;
 
+        // 打开绘图
+        plot->show();
+
     }else{
         ui->confirmFrameBtn->setEnabled(true);
 

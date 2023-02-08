@@ -37,6 +37,9 @@ public:
                       const QVector<double> &value2,
                       const QVector<double> &value3);
     void plotAddData(int index, double key, double value1=0, double value2=0, double value3=0);
+private slots:
+    void on_pushButton_clicked(bool checked);
+
 private:
     Ui::Plot *ui;
 };
