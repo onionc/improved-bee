@@ -139,8 +139,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 图形显示界面
     plot = new Plot();
-    //plot->show();
-
 
     // 协议未确认
     frameChecked = false;
@@ -682,18 +680,22 @@ void MainWindow::slot_serialPortCloseState(bool checked){
 }
 
 
+
 // 任务调度：数据处理（保存，解析）、绘图
 void MainWindow::slot_taskScheduler(){
     // 处理数据
 
+    // 获取锁
     if(rwLock.tryLockForWrite(3)){
         recvBuf += serialPort->recvBuf;
         // 保存原始数据
         if(bSaveRawFlag)
-            fRawFile.write(recvBuf);
+            fRawFile.write(serialPort->recvBuf);
         serialPort->recvBuf.clear();
 
         rwLock.unlock();
+    }else{
+        return;
     }
 
     // 解析数据

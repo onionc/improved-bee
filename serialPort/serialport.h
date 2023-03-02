@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QReadWriteLock>
+#include "util.h"
 
 extern QReadWriteLock rwLock; // 读写锁
 
@@ -32,6 +33,8 @@ public:
 public:
     // 数据缓冲区
     QByteArray recvBuf;
+
+    util::WriteFile writeFile2;
 
 signals:
     // 获取端口列表信号

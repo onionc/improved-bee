@@ -7,6 +7,9 @@ QReadWriteLock rwLock; // 读写锁
 SerialPort::SerialPort(QObject *parent) : QObject(parent){
     qSerialPort = new QSerialPort(this);
     qSerialPort->setFlowControl(QSerialPort::NoFlowControl); // 无流控
+
+
+    writeFile2.open("./dataSerialPort.raw");
 }
 
 SerialPort::~SerialPort(){
@@ -95,11 +98,15 @@ void SerialPort::slot_recvSerialPortData(){
     qint64 recvLen = qSerialPort->bytesAvailable();
     if(recvLen<1) return;
 
-    QByteArray t = qSerialPort->readAll();
-    rwLock.lockForWrite();
-    recvBuf.append(t);
-    rwLock.unlock();
 
-    qDebug()<<"buf:"<<recvBuf.size();
+    // 获取到锁之后再拿取数据
+    if(rwLock.tryLockForWrite(3)){
+
+        QByteArray t = qSerialPort->readAll();
+        writeFile2.write(t);
+        recvBuf.append(t);
+
+        rwLock.unlock();
+    }
 }
 
