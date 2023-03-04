@@ -639,9 +639,6 @@ void MainWindow::slot_serialPortOpenState(bool checked){
         tenSecData.clear();
         dataCount = 0;
 
-        // 打开绘图
-        plot->show();
-
     }else{
         ui->confirmFrameBtn->setEnabled(true);
 
@@ -921,12 +918,8 @@ void MainWindow::on_showPlotBtn_clicked()
     bool hidden = plot->isHidden();
     if(hidden){
         // 显示绘图界面
-
-        // todo 清空数据等
-
         plot->show();
     }else{
-
         plot->hide();
     }
 }

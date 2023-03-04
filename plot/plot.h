@@ -39,9 +39,14 @@ public:
     void plotAddData(int index, double key, double value1=0, double value2=0, double value3=0);
 private slots:
     void on_pushButton_clicked(bool checked);
+    // 清除绘图
+    void on_clearBtn_clicked();
 
 private:
     Ui::Plot *ui;
+
+    // 三个图形的计数
+    long xCount1, xCount2, xCount3;
 };
 
 #endif // PLOT_H

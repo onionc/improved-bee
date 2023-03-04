@@ -37,6 +37,10 @@ void Plot::initGraph(int index){
         qplot = ui->mPlot3;
     }
 
+    // 清除
+    qplot->clearGraphs();
+
+
     // 增加线条
     qplot->addGraph();
     qplot->graph(0)->setPen(QPen(Qt::red));
@@ -93,6 +97,10 @@ void Plot::initGraph(int index){
     // 鼠标放入绘图区，变手形状
     qplot->setCursor(QCursor(Qt::PointingHandCursor));
 
+    // 计数清空
+    xCount1 = xCount2 = xCount3 = 0;
+    // 重绘
+    qplot->replot();
 }
 
 void Plot::plotAddData(int index,
@@ -132,18 +140,22 @@ void Plot::plotAddData(int index, double key, double value1, double value2, doub
         return;
     }
     QCustomPlot *qplot;
+    long count = 0;
     if(index==1){
         qplot = ui->mPlot1;
+        count = ++xCount1;
     }else if(index==2){
         qplot = ui->mPlot2;
+        count = ++xCount2;
     }else if(index==3){
         qplot = ui->mPlot3;
+        count = ++xCount3;
     }
-    qplot->graph(0)->addData(key, value1);
+    qplot->graph(0)->addData(count, value1);
 
-    qplot->graph(1)->addData(key, value2);
+    qplot->graph(1)->addData(count, value2);
 
-    qplot->graph(2)->addData(key, value3);
+    qplot->graph(2)->addData(count, value3);
 
     // 自适应大小
     qplot->rescaleAxes();
@@ -165,4 +177,15 @@ void Plot::on_pushButton_clicked(bool checked)
     ui->mPlot1->replot(QCustomPlot::rpQueuedReplot);
     ui->mPlot2->replot(QCustomPlot::rpQueuedReplot);
     ui->mPlot3->replot(QCustomPlot::rpQueuedReplot);
+}
+
+void Plot::on_clearBtn_clicked()
+{
+    //ui->mPlot1->clearPlottables();
+    //ui->mPlot2->clearPlottables();
+    //ui->mPlot3->clearPlottables();
+
+    initGraph(1);
+    initGraph(2);
+    initGraph(3);
 }
