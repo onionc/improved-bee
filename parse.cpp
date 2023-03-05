@@ -64,7 +64,7 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
 
 
 // 协议帧信息解析：查找帧头、校验、帧长
-bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg){
+bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg, uint &chartNum){
 
     int itmp = 0;
     QString tmp;
@@ -230,6 +230,9 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
         errorMsg = QString("脚本加载错误");
         return false;
     }
+
+    // 将三个图表的线条数量返回，十进制的一二三位分别表示
+    chartNum = curve1Count + curve2Count*10 + curve3Count*100;
 
     return true;
 }

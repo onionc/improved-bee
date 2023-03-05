@@ -12,11 +12,8 @@ Plot::Plot(QWidget *parent) :
     // 主窗口关闭时，关闭子窗口
     setAttribute(Qt::WA_QuitOnClose, false);
 
-    // 初始化图形1~3
-    initGraph(1);
-    initGraph(2);
-    initGraph(3);
 
+    chart1=chart2=chart3=0;
 }
 
 Plot::~Plot()
@@ -24,30 +21,89 @@ Plot::~Plot()
     delete ui;
 }
 
+// 设置图表中线条个数
+void Plot::setChartNum(int chart1Num, int chart2Num, int chart3Num){
+    if(chart1Num<1){
+        chart1Num = 0;
+    }else if(chart1Num>3){
+        chart1Num = 3;
+    }
+    if(chart2Num<1){
+        chart2Num = 0;
+    }else if(chart2Num>3){
+        chart2Num = 3;
+    }
+    if(chart3Num<1){
+        chart3Num = 0;
+    }else if(chart3Num>3){
+        chart3Num = 3;
+    }
+    chart1 = chart1Num;
+    chart2 = chart2Num;
+    chart3 = chart3Num;
+
+    init();
+}
+// 初始化图表
+void Plot::init(){
+    if(chart1>0){
+        initGraph(1);
+    }
+
+    if(chart2>0){
+        initGraph(2);
+    }
+
+    if(chart3>0){
+        initGraph(3);
+    }
+}
+
+
 void Plot::initGraph(int index){
     if(index<1 || index>3){
         return;
     }
     QCustomPlot *qplot;
+    int chartNum = 0; // 线条数量
     if(index==1){
         qplot = ui->mPlot1;
+        chartNum = chart1;
     }else if(index==2){
         qplot = ui->mPlot2;
+        chartNum = chart2;
     }else if(index==3){
         qplot = ui->mPlot3;
+        chartNum = chart3;
     }
 
     // 清除
     qplot->clearGraphs();
 
 
-    // 增加线条
-    qplot->addGraph();
-    qplot->graph(0)->setPen(QPen(Qt::red));
-    qplot->addGraph();
-    qplot->graph(1)->setPen(QPen(Qt::blue));
-    qplot->addGraph();
-    qplot->graph(2)->setPen(QPen(Qt::darkGreen));
+
+    if(chartNum>0){
+        // 增加线条
+        qplot->addGraph();
+        qplot->graph(0)->setPen(QPen(Qt::red));
+        // 显示数据点
+        qplot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
+    }
+    if(chartNum>1){
+        qplot->addGraph();
+        qplot->graph(1)->setPen(QPen(Qt::blue));
+
+        qplot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
+    }
+    if(chartNum>2){
+        qplot->addGraph();
+        qplot->graph(2)->setPen(QPen(Qt::darkGreen));
+
+        qplot->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
+    }
+
+    // 自动设置界面范围
+    qplot->rescaleAxes();
 
     // 坐标轴显示刻度
     qplot->yAxis->setTickLabels(true);
@@ -99,6 +155,10 @@ void Plot::initGraph(int index){
 
     // 计数清空
     xCount1 = xCount2 = xCount3 = 0;
+
+    // 图例默认不显示
+    qplot->legend->setVisible(false);
+
     // 重绘
     qplot->replot();
 }
@@ -140,33 +200,41 @@ void Plot::plotAddData(int index, double key, double value1, double value2, doub
         return;
     }
     QCustomPlot *qplot;
-    long count = 0;
+    long count = 0; // x轴计数
+    int chartNum = 0; // 线条数量
     if(index==1){
         qplot = ui->mPlot1;
         count = ++xCount1;
+        chartNum = chart1;
     }else if(index==2){
         qplot = ui->mPlot2;
         count = ++xCount2;
+        chartNum = chart2;
     }else if(index==3){
         qplot = ui->mPlot3;
         count = ++xCount3;
+        chartNum = chart3;
     }
-    qplot->graph(0)->addData(count, value1);
+    if(chartNum>0){
+        qplot->graph(0)->addData(count, value1);
+        if(chartNum>1){
+            qplot->graph(1)->addData(count, value2);
+        }
+        if(chartNum>2){
+            qplot->graph(2)->addData(count, value3);
+        }
 
-    qplot->graph(1)->addData(count, value2);
+        // 自适应大小
+        qplot->rescaleAxes(true);
+        // 放大区间，使数据边界进入图形内
+        double dCenter = qplot->yAxis->range().center();
+        if(fabs(dCenter)>1e-5){ // 接近0的不缩放，0会触发问题一直缩放刻度的bug
+            qplot->yAxis->scaleRange(1.1, dCenter);
+        }
 
-    qplot->graph(2)->addData(count, value3);
-
-    // 自适应大小
-    qplot->rescaleAxes();
-    // 放大区间，使数据边界进入图形内
-    double dCenter = qplot->yAxis->range().center();
-    if(dCenter>1e-5){ // 接近0的不缩放，0会触发问题一直缩放刻度的bug
-        qplot->yAxis->scaleRange(1.2, dCenter);
+        // 重绘
+        qplot->replot(QCustomPlot::rpQueuedReplot);
     }
-
-    // 重绘
-    qplot->replot(QCustomPlot::rpQueuedReplot);
 }
 
 void Plot::on_pushButton_clicked(bool checked)
@@ -179,13 +247,8 @@ void Plot::on_pushButton_clicked(bool checked)
     ui->mPlot3->replot(QCustomPlot::rpQueuedReplot);
 }
 
+
 void Plot::on_clearBtn_clicked()
 {
-    //ui->mPlot1->clearPlottables();
-    //ui->mPlot2->clearPlottables();
-    //ui->mPlot3->clearPlottables();
-
-    initGraph(1);
-    initGraph(2);
-    initGraph(3);
+    init();
 }

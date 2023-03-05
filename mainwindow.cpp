@@ -435,7 +435,8 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 协议确认
         frameFormat(); // 协议转结构体
         QString errorMsg;
-        if(!(parse.parseFrameInfo(&frameData, errorMsg))){
+        uint chartNum; // 三个图表的线条数量
+        if(!(parse.parseFrameInfo(&frameData, errorMsg, chartNum))){
             ui->confirmFrameBtn->setChecked(false);
             QMessageBox::critical(this, "error", errorMsg);
             return;
@@ -479,6 +480,9 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
 
         // 切换表格
         switchTable(false);
+
+        // 初始化图表
+        plot->setChartNum(chartNum%10, chartNum/10%10, chartNum/100%10);
 
         frameChecked = true;
 
