@@ -35,7 +35,7 @@ void Parse::writeToIni(const QVector<SProperty> *data, QString saveFilename){
 
 
 // 从ini文件读取
-void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
+void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data, bool &frameLittleEndian,quint32 &frameHz){
     // 打开ini文件
     data->clear();
     QSettings read(readFilename, QSettings::IniFormat);
@@ -56,6 +56,11 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data){
             info.curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool();
             info.curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool();
             data->push_back(info);
+        }else if(groupKey=="endian"){
+            // util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toBool();
+            frameLittleEndian = read.value(QString("%1/endian").arg(INI_OTHER)).toBool();
+        }else if(groupKey=="hz"){
+            frameHz = read.value(QString("%1/hz").arg(INI_OTHER)).toUInt();
         }
     }
 }

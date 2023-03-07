@@ -27,8 +27,15 @@ public:
 
     // 协议写入ini文件
     void writeToIni(const QVector<SProperty> *data, QString saveFilename);
-    // 从ini文件读取
-    void loadFromIni(QString readFilename, QVector<SProperty> *data);
+    //
+    /**
+     * @brief loadFromIni 从ini文件读取协议数据
+     * @param readFilename 文件名
+     * @param data 数据部分
+     * @param frameLittleEndian 是否为小端
+     * @param frameHz 频率
+     */
+    void loadFromIni(QString readFilename, QVector<SProperty> *data, bool &frameLittleEndian,quint32 &frameHz);
 
     /**
      * @brief parseFrameInfo 协议帧信息解析：查找帧头、校验、帧长

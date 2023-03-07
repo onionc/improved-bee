@@ -43,10 +43,12 @@ private:
     void switchTable(bool formatPage=true); // 切换表格的显示, framePage=true 显示协议编辑框，=false显示数据框
 
     // 数据协议
-    void frameFormat(); // 协议格式化，从table获取数据转为vector
     bool frameChecked; // 数据协议确认
     bool frameLittleEndian; // =true 小端字节序, =false 大端
     quint32 frameHz; // 频率
+
+    // 从文件中读取协议，确认数据帧
+    void loadFrameByFile();
 
     // 串口
     bool isOpenSerialPort; // 串口是否打开
@@ -82,25 +84,6 @@ private:
 
 private slots:
     // ---- 数据协议 ----
-
-    // 新增一行
-    void on_addRowBtn_clicked();
-    // 删除选定行
-    void on_delRowBtn_clicked();
-    // 添加帧头
-    void on_addHeaderBtn_clicked();
-    // 添加校验和
-    void on_addCheckSumBtn_clicked();
-    // 保存协议
-    void on_saveFrameBtn_clicked();
-    // 加载协议
-    void on_loadFrameBtn_clicked();
-    // 清空表格
-    void clearTable();
-    // 确认数据协议
-    void on_confirmFrameBtn_clicked(bool checked);
-    // 使能/失能 协议按钮
-    void enableFrameBtn(bool state);
 
     // 打开和关闭串口
     void on_openPortBtn_clicked(bool checked);

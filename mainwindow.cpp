@@ -10,85 +10,23 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // 表格设置
-    QStringList headerText;
-    headerText<<"名称"<<"数据类型"<<"数值"<<"累加"<<"图1"<<"图2"<<"图3";
-    ui->tableWidget->setColumnCount(headerText.count()); // 列数
-    ui->tableWidget->setHorizontalHeaderLabels(headerText); // 设置水平表头数据
-    ui->tableWidget->horizontalHeader()->setVisible(true); // 水平表头有效
-    ui->tableWidget->verticalHeader()->setVisible(true); // 竖直表头有效
-    ui->tableWidget->setColumnWidth(colName, 140); // 列宽
-    ui->tableWidget->setColumnWidth(colType, 90);
-    ui->tableWidget->setColumnWidth(colData, 140);
-    ui->tableWidget->setColumnWidth(colAccumCheck, 40);
-    ui->tableWidget->setColumnWidth(colCurve1, 40);
-    ui->tableWidget->setColumnWidth(colCurve2, 40);
-    ui->tableWidget->setColumnWidth(colCurve3, 40);
-    ui->tableWidget->setAlternatingRowColors(true); // 隔行换色
-    ui->tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn); // 竖直滚动条
-    ui->tableWidget->setItemDelegateForColumn(colType,&comboboxDelegate);   //委托
 
-    ui->tableWidget->setDragEnabled(true); // 开启拖拽
-    ui->tableWidget->setDragDropMode(QAbstractItemView::InternalMove );  // 拖拽，内部移动
-    ui->tableWidget->setDropIndicatorShown(true); // 拖拽时提示
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows); // 选定一行
 
     // 显示数据的表格设置
-    showTableWidget = new QTableWidget();
-    showTableWidget->setObjectName("showTableWidget");
-    /* 在确认时再动态设置
-    headerText.clear();
-    headerText<<"xx"<<"xx";
-    showTableWidget->setRowCount(headerText.count());
-    showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
-    */
-    showTableWidget->setColumnCount(1); // 列数
-    showTableWidget->horizontalHeader()->setVisible(false); // 水平表头有效
-    showTableWidget->verticalHeader()->setVisible(true); // 竖直表头有效
-    showTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->verticalLayout_2->addWidget(showTableWidget); // 添加到布局内
+    ui->tableWidget->setColumnCount(1); // 列数
+    ui->tableWidget->horizontalHeader()->setVisible(false); // 水平表头有效
+    ui->tableWidget->verticalHeader()->setVisible(true); // 竖直表头有效
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    //ui->tableWidget->show();
 
-
-    switchTable(true); // 隐藏表格2，只显示编辑框
-
-    // toolBox控制界面设置
-    ui->panelBox->setCurrentIndex(0); // 默认第一页
 
 
     // 日志
     util::logInit();
 
-
-    // 协议
-    on_addHeaderBtn_clicked(); // 插入一行帧头
-    ui->confirmFrameBtn->setCheckable(true);
-    ui->confirmFrameBtn->setChecked(false);
-
-    // 字节序和频率设置
-    QStringList endian, hz;
-    endian<<"小端"<<"大端";
-    ui->endian_comboBox->addItems(endian);
-    ui->endian_comboBox->setCurrentIndex(0);
-    hz<<"1"<<"5"<<"10"<<"20"<<"50"<<"100"<<"200"<<"500"<<"1000"<<"2000";
-    ui->hz_comboBox->addItems(hz);
-    ui->hz_comboBox->setCurrentText(QString("%1").arg(DEFAULT_HZ));
-
+    // todo del
     frameLittleEndian = true; // 默认字节序：小端
     frameHz = DEFAULT_HZ; // 默认频率：200Hz
-    // 通过信号槽改变字节序和频率变量
-    connect(ui->endian_comboBox, static_cast<void(QComboBox::*)(int index)>(&QComboBox::currentIndexChanged),
-            [=](int index){
-                frameLittleEndian = index==0;
-            }
-    );
-    connect(ui->hz_comboBox, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-            [=](const QString &t){
-                frameHz = t.toInt();
-                if(frameHz<1 || frameHz>2000){
-                    frameHz = DEFAULT_HZ;
-                }
-            }
-    );
 
     // 串口设置
     QStringList baudrate, dataBit, stopBit, parity;
@@ -133,9 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
 
-    // 图像相关
-    ui->led->setSize(15);
-    ui->led->setColor(0); // 设定LED为灰色
 
     // 图形显示界面
     plot = new Plot();
@@ -258,131 +193,18 @@ void MainWindow::addRow(int curRow, QString name, EnumClass::typeListEnum type, 
 
 
 // ----------------------- 数据协议 -----------------------
-// 增加一行
-void MainWindow::on_addRowBtn_clicked()
+// 从文件中读取协议，确认数据帧
+void MainWindow::loadFrameByFile()
 {
-    int curRow = ui->tableWidget->rowCount();
-    ui->tableWidget->insertRow(curRow);
-    QString name  = QString("name_%1").arg(curRow+1);
-    addRow(curRow, name);
 
-    // 选定新行
-    ui->tableWidget->selectRow(curRow);
-}
+    QString errorMsg;
+    uint chartNum; // 三个图表的线条数量
 
-// 删除选定行
-void MainWindow::on_delRowBtn_clicked()
-{
-    ui->tableWidget->removeRow(ui->tableWidget->currentRow());
 
-    ui->tableWidget->selectRow(ui->tableWidget->currentRow());
-
-    /* 删除所有行
-    int row = ui->tableWidget->rowCount();
-    for(int i=row-1; i>=0; i--){
-        ui->tableWidget->removeRow(i);
-    }
-    */
-}
-
-// 添加帧头
-void MainWindow::on_addHeaderBtn_clicked()
-{
-    int curRow = ui->tableWidget->rowCount();
-    ui->tableWidget->insertRow(curRow);
-
-    addRow(curRow, FRAME_HEADER, EnumClass::t_uchar, "0xAA");
-
-    // 选定新行
-    ui->tableWidget->selectRow(curRow);
-}
-
-// 添加校验和
-void MainWindow::on_addCheckSumBtn_clicked()
-{
-    int curRow = ui->tableWidget->rowCount();
-    ui->tableWidget->insertRow(curRow);
-
-    addRow(curRow, FRAME_CHECK, EnumClass::t_uchar, "");
-
-    // 选定新行
-    ui->tableWidget->selectRow(curRow);
-}
-
-// 协议格式化，从table获取数据转为vector
-void MainWindow::frameFormat(){
+    // 从ini文件读取协议
     frameData.clear();
-
-    for(int i=0; i<ui->tableWidget->rowCount(); i++) {
-        SProperty info;
-
-        // 名称、类型
-        info.name = ui->tableWidget->item(i, colName)->text();
-        info.type = ui->tableWidget->item(i, colType)->text();
-
-        // 数据
-        if(info.name==FRAME_HEADER){
-            // 帧头
-            info.data = ui->tableWidget->item(i, colData)->text();
-        }else if(info.name==FRAME_CHECK){
-            // 校验通过checkbox获取数据
-            QComboBox *box = static_cast<QComboBox*>(ui->tableWidget->cellWidget(i, colData));
-            info.data = box->currentText();
-        }else{
-            // 脚本
-            QTextEdit *edit = static_cast<QTextEdit*>(ui->tableWidget->cellWidget(i, colData));
-            info.data = edit->toPlainText();
-        }
-
-        // 是否选定
-        info.accumCheck = ui->tableWidget->item(i, colAccumCheck)->checkState()==Qt::Checked;
-
-        // 图表绘图项是否选定
-        info.curve1 = ui->tableWidget->item(i, colCurve1)->checkState()==Qt::Checked;
-        info.curve2 = ui->tableWidget->item(i, colCurve2)->checkState()==Qt::Checked;
-        info.curve3 = ui->tableWidget->item(i, colCurve3)->checkState()==Qt::Checked;
-
-        frameData.push_back(info);
-    }
-}
-
-// 保存协议
-void MainWindow::on_saveFrameBtn_clicked()
-{
-    // 创建目录
-    QString dir = util::createDir("config");
-
-    QString filter = "协议文件(*.ini);;所有文件(*.*)";
-    QString saveFilename = QFileDialog::getSaveFileName(this, " 另存为", dir, filter);
-
-    if(saveFilename.isEmpty()){
-        QMessageBox::warning(this, "保存失败", "文件名为空");
-        return;
-    }
-
-    // 转义数据
-    frameFormat();
-
-    // 保存协议到ini文件
-    parse.writeToIni(&frameData, saveFilename);
-    // 保存其他
-    util::writeIni(saveFilename, QString("%1/endian").arg(INI_OTHER), frameLittleEndian);
-    util::writeIni(saveFilename, QString("%1/hz").arg(INI_OTHER), frameHz);
-
-}
-
-// 清除表格数据
-void MainWindow::clearTable(){
-    int i = ui->tableWidget->rowCount()-1;
-    for(; i>=0; i--)
-    {
-        ui->tableWidget->removeRow(i);
-    }
-}
-
-// 加载协议
-void MainWindow::on_loadFrameBtn_clicked()
-{
+    QString loadFilename = "./data.obj";
+    /* 从目录中选择文件，这里不需要，直接从固定文件读取
     // 创建目录
     QString dir = util::createDir("config");
 
@@ -392,143 +214,37 @@ void MainWindow::on_loadFrameBtn_clicked()
         QMessageBox::warning(this, "打开失败", "文件名为空");
         return;
     }
-
-    // 清除
-    clearTable();
-
-    // 从ini文件读取协议
-    parse.loadFromIni(loadFilename, &frameData);
-    // 读取其他字段
-    // 其他配置：字节序、频率，会通过槽函数更新变量
-    ui->endian_comboBox->setCurrentIndex(util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toBool()?0:1);
-    ui->hz_comboBox->setCurrentText(util::readIni(loadFilename, QString("%1/hz").arg(INI_OTHER)).toString());
-
-    // 显示到table
-    QString name, data;
-    int curRow = ui->tableWidget->rowCount();
-    Qt::CheckState accumCheck, curve1, curve2, curve3; // 选定状态：累加标志，图1，图2，图3
-    EnumClass::typeListEnum type;
-
-    foreach (SProperty info, frameData) {
-        name = info.name;
-        type = DATA::str2Type(info.type);
-        data = info.data;
-
-        accumCheck = info.accumCheck ? Qt::Checked : Qt::Unchecked;
-        curve1 = info.curve1 ? Qt::Checked : Qt::Unchecked;
-        curve2 = info.curve2 ? Qt::Checked : Qt::Unchecked;
-        curve3 = info.curve3 ? Qt::Checked : Qt::Unchecked;
-
-        // 插入一行
-        ui->tableWidget->insertRow(curRow);
-        addRow(curRow, name, type, data, accumCheck, curve1, curve2, curve3);
-        curRow++;
+    */
+    parse.loadFromIni(loadFilename, &frameData, frameLittleEndian, frameHz);
+    // 协议确认
+    if(!(parse.parseFrameInfo(&frameData, errorMsg, chartNum))){
+        QMessageBox::critical(this, "error", errorMsg);
+        return;
     }
 
-}
-
-// 确认数据帧
-void MainWindow::on_confirmFrameBtn_clicked(bool checked)
-{
-    if(checked){
-
-        // 协议确认
-        frameFormat(); // 协议转结构体
-        QString errorMsg;
-        uint chartNum; // 三个图表的线条数量
-        if(!(parse.parseFrameInfo(&frameData, errorMsg, chartNum))){
-            ui->confirmFrameBtn->setChecked(false);
-            QMessageBox::critical(this, "error", errorMsg);
-            return;
-        }
-
-        // 获取字节序和频率
-        frameLittleEndian = ui->endian_comboBox->currentIndex()==0;
-        frameHz = ui->hz_comboBox->currentText().toUInt();
-        if(frameHz<1 || frameHz>2000){
-            ui->confirmFrameBtn->setChecked(false);
-            QMessageBox::critical(this, "error", "频率获取失败");
-            return;
-        }
-
-        // 帧长显示
-        ui->frameLenlabel->setText(QString("%1").arg(parse.getFrameLen()));
-
-        util::smallEndian = frameLittleEndian; // 字节序赋值
-
-        // 设置界面
-        ui->confirmFrameBtn->setText("编辑数据协议");
-        // 失能表格
-        ui->tableWidget->setEnabled(false);
-        //ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-        // 失能按钮
-        enableFrameBtn(false);
-
-
-
-        // 设置显示数据用的表格
-        QStringList headerText;
-        for(int i=0; i<parse.getNavData()->size(); i++){
-            headerText << parse.getNavData()->value(i).name;
-        }
-        showTableWidget->setRowCount(headerText.count());
-        showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
-        for(int i=0; i<parse.getNavData()->size(); i++){
-            showTableWidget->setItem(i, 0,new QTableWidgetItem());
-        }
-
-        // 切换表格
-        switchTable(false);
-
-        // 初始化图表
-        plot->setChartNum(chartNum%10, chartNum/10%10, chartNum/100%10);
-
-        frameChecked = true;
-
-    }else{
-        ui->confirmFrameBtn->setText("确认数据协议");
-
-        // 使能表格
-        ui->tableWidget->setEnabled(true);
-        //ui->tableWidget->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
-
-        // 使能按钮
-        enableFrameBtn(true);
-
-        // 切换表格
-        switchTable(true);
-
-        frameChecked = false;
-    }
-}
-
-// 切换表格的显示
-void MainWindow::switchTable(bool formatPage){
-    if(formatPage){
-        ui->tableWidget->show();
-        showTableWidget->hide();
-    }else{
-        ui->tableWidget->hide();
-        showTableWidget->show();
-    }
-}
-
-// 使能/失能 协议编辑按钮
-void MainWindow::enableFrameBtn(bool state){
-    QList<QPushButton *> pushButtons = ui->page->findChildren<QPushButton *>();
-    foreach(QPushButton *a, pushButtons){
-        // 仅保存和确认数据按钮可用
-        if(a==ui->confirmFrameBtn || a==ui->saveFrameBtn){
-            continue;
-        }
-        a->setEnabled(state);
+    if(frameHz<1 || frameHz>2000){
+        QMessageBox::critical(this, "error", "频率获取失败");
+        return;
     }
 
-    ui->endian_comboBox->setEnabled(state);
-    ui->hz_comboBox->setEnabled(state);
-}
+    util::smallEndian = frameLittleEndian; // 字节序赋值
 
+    // 设置显示数据用的表格
+    QStringList headerText;
+    for(int i=0; i<parse.getNavData()->size(); i++){
+        headerText << parse.getNavData()->value(i).name;
+    }
+    ui->tableWidget->setRowCount(headerText.count());
+    ui->tableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
+    for(int i=0; i<parse.getNavData()->size(); i++){
+        ui->tableWidget->setItem(i, 0,new QTableWidgetItem());
+    }
+
+    // 初始化图表
+    plot->setChartNum(chartNum%10, chartNum/10%10, chartNum/100%10);
+
+    frameChecked = true;
+}
 
 // ----------------------------- 串口 ----------------------------
 // 打开和关闭串口
@@ -590,51 +306,36 @@ void MainWindow::on_openPortBtn_clicked(bool checked)
 // 串口打开时的信号变化
 void MainWindow::slot_serialPortOpenState(bool checked){
     if(checked){
-        ui->confirmFrameBtn->setEnabled(false); // 失能编辑协议按钮
-
-        ui->led->setColor(2); // 点亮led（绿色）
         ui->openPortBtn->setText("断开串口");
 
         recvBuf.clear(); // 清除临时存储的数据
         runTimer->start(); // 任务开始执行
 
-        // 保存文件选项
-        bSaveRawFlag = ui->saveRaw_cbx->checkState()==Qt::Checked;
-        bSave1sFlag =  ui->save1s_cbx->checkState()==Qt::Checked;
-        bSave10sFlag = ui->save10s_cbx->checkState()==Qt::Checked;
+
         // 新建目录
         QString path = QString("data/%1").arg(util::getDatetime(false, true));
 
-        if(bSaveRawFlag){
-            fRawFile.close();
-            fNavDataFile.close();
+        // 保存文件
+        fRawFile.close();
+        fNavDataFile.close();
 
-            if(!fRawFile.open(path+"/data.raw")){
-                QMessageBox::warning(this, "error", "文件创建失败");
-                return;
-            }
-            if(!fNavDataFile.open(path+"/navFile.csv")){
-                QMessageBox::warning(this, "error", "文件创建失败");
-                return;
-            }
-
+        if(!fRawFile.open(path+"/data.raw")){
+            QMessageBox::warning(this, "error", "文件创建失败");
+            return;
+        }
+        if(!fNavDataFile.open(path+"/navFile.csv")){
+            QMessageBox::warning(this, "error", "文件创建失败");
+            return;
         }
 
-        if(bSave1sFlag){
-            f1sFile.close();
-            if(!f1sFile.open(path+"/oneSecFile.csv")){
-                QMessageBox::warning(this, "error", "文件创建失败");
-                return;
-            }
+        // 1s数据
+        f1sFile.close();
+        if(!f1sFile.open(path+"/oneSecFile.csv")){
+            QMessageBox::warning(this, "error", "文件创建失败");
+            return;
         }
 
-        if(bSave10sFlag){
-            f10sFile.close();
-            if(!f10sFile.open(path+"/tenSecFile.csv")){
-                QMessageBox::warning(this, "error", "文件创建失败");
-                return;
-            }
-        }
+
 
         LogShow("文件保存目录："+path);
 
@@ -644,9 +345,7 @@ void MainWindow::slot_serialPortOpenState(bool checked){
         dataCount = 0;
 
     }else{
-        ui->confirmFrameBtn->setEnabled(true);
 
-        ui->led->setColor(1); // 红色
         ui->openPortBtn->setChecked(false);
 
         QMessageBox::critical(this, "失败", "串口打开失败");
@@ -656,9 +355,7 @@ void MainWindow::slot_serialPortOpenState(bool checked){
 // 串口关闭时的信号变化
 void MainWindow::slot_serialPortCloseState(bool checked){
     if(checked){
-        ui->confirmFrameBtn->setEnabled(true);
 
-        ui->led->setColor(0); // 灰色
         ui->openPortBtn->setText("连接串口");
 
         runTimer->stop(); // 任务停止执行
@@ -670,9 +367,6 @@ void MainWindow::slot_serialPortCloseState(bool checked){
         f10sFile.close();
 
     }else{
-        ui->confirmFrameBtn->setEnabled(false);
-
-        ui->led->setColor(2); // 红色
         ui->openPortBtn->setChecked(true);
 
         QMessageBox::critical(this, "失败", "串口关闭失败");

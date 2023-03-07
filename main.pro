@@ -58,8 +58,7 @@ HEADERS += \
     plot/qcustomplot.h
 
 FORMS += \
-        mainwindow.ui \
-    plot/plot.ui
+        mainwindow.ui
 
 RESOURCES += \
     res.qrc
