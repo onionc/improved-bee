@@ -16,8 +16,8 @@ public:
     explicit Plot(QCustomPlot *mPlot);
     ~Plot();
 
-    // 初始化图形框 1~3
-    void initGraph(int index);
+    // 初始化图表
+    void initGraph();
     //  index为图形索引
     /**
      * @brief plotAddData 图形增加数据
@@ -35,15 +35,15 @@ public:
     void plotAddData(int index, double key, double value1=0, double value2=0, double value3=0);
 
     // 设置图表中线条个数，并初始化
-    void setChartNum(int chart1Num, int chart2Num, int chart3Num);
+    void setChartNum(int chart1Num);
     // 清除绘图
     void on_clearBtn_clicked();
 
 private:
     QCustomPlot *qplot;
 
-    // 三个图表每个里面有几条线，数值为0则图表不绘制
-    int chart1, chart2, chart3;
+    // 图表里面有几条线，数值为0则图表不绘制
+    int chart1;
 
     // 三个图形的x计数
     long xCount1, xCount2, xCount3;

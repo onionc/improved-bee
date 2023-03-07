@@ -34,7 +34,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QTableWidget  *showTableWidget;
 
     // 表格
     ComboboxDelegate comboboxDelegate; // // 下拉框代理

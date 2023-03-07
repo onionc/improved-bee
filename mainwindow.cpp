@@ -79,7 +79,8 @@ MainWindow::MainWindow(QWidget *parent) :
     frameChecked = false;
 
     // 文件
-    bSaveRawFlag = bSave1sFlag = bSave10sFlag = false;
+    bSaveRawFlag = bSave1sFlag = true;
+    bSave10sFlag = false;
 
 }
 
@@ -221,6 +222,8 @@ void MainWindow::loadFrameByFile()
         return;
     }
 
+    qDebug()<<"chartNum"<<chartNum;
+
     if(frameHz<1 || frameHz>2000){
         QMessageBox::critical(this, "error", "频率获取失败");
         return;
@@ -240,7 +243,7 @@ void MainWindow::loadFrameByFile()
     }
 
     // 初始化图表
-    plot->setChartNum(chartNum%10, chartNum/10%10, chartNum/100%10);
+    plot->setChartNum(chartNum);
 
     frameChecked = true;
 }
@@ -542,7 +545,8 @@ void MainWindow::slot_taskScheduler(){
                 // 1s 动态更新表格数据
                 if((dataCount+1)%frameHz==0){
                     // 需要用到j, 所以放到for内
-                    showTableWidget->item(j, 0)->setText(oneSecData[j].getDataStr());
+                    ui->tableWidget->item(j, 0)->setText(oneSecData[j].getDataStr());
+                    qDebug()<<"j:"<<j<<" value="<<oneSecData[j].getDataStr();
                 }
 
                 // 绘图数据准备
@@ -565,8 +569,6 @@ void MainWindow::slot_taskScheduler(){
             // 1s 绘图添加数据
             if((dataCount+1)%frameHz==0){
                 plot->plotAddData(1, dataCount, cv1[0], cv1[1], cv1[2]);
-                plot->plotAddData(2, dataCount, cv2[0], cv2[1], cv2[2]);
-                plot->plotAddData(3, dataCount, cv3[0], cv3[1], cv3[2]);
             }
 
             // 写入 1s 数据，并清除使之重新计算

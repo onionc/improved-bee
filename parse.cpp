@@ -206,14 +206,6 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                 curve1Count++;
                 nav.curve1Index = curve1Count;
             }
-            if(info->curve2 && curve2Count<3){
-                curve2Count++;
-                nav.curve2Index = curve2Count;
-            }
-            if(info->curve3 && curve3Count<3){
-                curve3Count++;
-                nav.curve3Index = curve3Count;
-            }
 
             frameDataArr.push_back(nav);
         }
@@ -236,7 +228,7 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
     }
 
     // 将三个图表的线条数量返回，十进制的一二三位分别表示
-    chartNum = curve1Count + curve2Count*10 + curve3Count*100;
+    chartNum = curve1Count;
 
     return true;
 }
