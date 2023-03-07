@@ -1,24 +1,14 @@
 #include "plot.h"
-#include "ui_plot.h"
-#include "plot/qcustomplot.h"
 
-Plot::Plot(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Plot)
+
+Plot::Plot(QCustomPlot *mPlot)
 {
-    ui->setupUi(this);
-    // 标题
-    setWindowTitle("绘图");
-    // 主窗口关闭时，关闭子窗口
-    setAttribute(Qt::WA_QuitOnClose, false);
-
-
+    this->qplot = mPlot;
     chart1=chart2=chart3=0;
 }
 
 Plot::~Plot()
 {
-    delete ui;
 }
 
 // 设置图表中线条个数
@@ -61,21 +51,12 @@ void Plot::init(){
 
 
 void Plot::initGraph(int index){
-    if(index<1 || index>3){
+    if(index<1 || index>3){ // 可以有1~3个线条
         return;
     }
     QCustomPlot *qplot;
     int chartNum = 0; // 线条数量
-    if(index==1){
-        qplot = ui->mPlot1;
-        chartNum = chart1;
-    }else if(index==2){
-        qplot = ui->mPlot2;
-        chartNum = chart2;
-    }else if(index==3){
-        qplot = ui->mPlot3;
-        chartNum = chart3;
-    }
+
 
     // 清除
     qplot->clearGraphs();
@@ -129,19 +110,7 @@ void Plot::initGraph(int index){
     qplot->legend->setSelectedIconBorderPen(legendPen);
     // 设置图例中可以被选择的部分：仅选择其中的每个图例项，不会选择边框
     qplot->legend->setSelectableParts(QCPLegend::spItems);
-    // 选中图例时，对应线条也选中
-    connect(qplot, &QCustomPlot::selectionChangedByUser, this, [=](){
-        for (int i=0; i<qplot->graphCount(); ++i){
-            QCPGraph *graph = qplot->graph(i);
-            QCPPlottableLegendItem *item = qplot->legend->itemWithPlottable(graph);
-            if (item->selected() || graph->selected())
-            {
-            item->setSelected(true);
-            graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
-            graph->selectionDecorator()->setPen(QPen(QColor(Qt::magenta)));
-            }
-        }
-    });
+
 
     // 四边都有轴
     // qplot->axisRect()->setupFullAxesBox();
@@ -163,58 +132,19 @@ void Plot::initGraph(int index){
     qplot->replot();
 }
 
-void Plot::plotAddData(int index,
-                  const QVector<double> &key,
-                  const QVector<double> &value1,
-                  const QVector<double> &value2,
-                  const QVector<double> &value3){
-
-    if(index<1 || index>3){
-        return;
-    }
-    QCustomPlot *qplot;
-    if(index==1){
-        qplot = ui->mPlot1;
-    }else if(index==2){
-        qplot = ui->mPlot2;
-    }else if(index==3){
-        qplot = ui->mPlot3;
-    }
-
-    if(!value1.isEmpty()){
-        qplot->graph(0)->addData(key, value1);
-    }
-
-    if(!value2.isEmpty()){
-        qplot->graph(1)->addData(key, value2);
-    }
-
-    if(!value3.isEmpty()){
-        qplot->graph(2)->addData(key, value3);
-    }
-}
 
 void Plot::plotAddData(int index, double key, double value1, double value2, double value3){
 
-    if(index<1 || index>3){
+    if(index!=1){  // 只允许有一个图表
         return;
     }
     QCustomPlot *qplot;
     long count = 0; // x轴计数
     int chartNum = 0; // 线条数量
-    if(index==1){
-        qplot = ui->mPlot1;
-        count = ++xCount1;
-        chartNum = chart1;
-    }else if(index==2){
-        qplot = ui->mPlot2;
-        count = ++xCount2;
-        chartNum = chart2;
-    }else if(index==3){
-        qplot = ui->mPlot3;
-        count = ++xCount3;
-        chartNum = chart3;
-    }
+
+    count = ++xCount1;
+    chartNum = chart1;
+
     if(chartNum>0){
         qplot->graph(0)->addData(count, value1);
         if(chartNum>1){
@@ -236,17 +166,6 @@ void Plot::plotAddData(int index, double key, double value1, double value2, doub
         qplot->replot(QCustomPlot::rpQueuedReplot);
     }
 }
-
-void Plot::on_pushButton_clicked(bool checked)
-{
-    ui->mPlot1->legend->setVisible(checked);
-    ui->mPlot2->legend->setVisible(checked);
-    ui->mPlot3->legend->setVisible(checked);
-    ui->mPlot1->replot(QCustomPlot::rpQueuedReplot);
-    ui->mPlot2->replot(QCustomPlot::rpQueuedReplot);
-    ui->mPlot3->replot(QCustomPlot::rpQueuedReplot);
-}
-
 
 void Plot::on_clearBtn_clicked()
 {

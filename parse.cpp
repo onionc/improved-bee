@@ -37,7 +37,6 @@ void Parse::writeToIni(const QVector<SProperty> *data, QString saveFilename){
 // 从ini文件读取
 void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data, bool &frameLittleEndian,quint32 &frameHz){
     // 打开ini文件
-    data->clear();
     QSettings read(readFilename, QSettings::IniFormat);
     read.setIniCodec(QTextCodec::codecForName("UTF-8"));
     QStringList allGroups = read.childGroups();

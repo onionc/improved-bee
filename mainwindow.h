@@ -96,9 +96,6 @@ private slots:
     // 任务调度：数据处理、绘图
     void slot_taskScheduler();
 
-    // 显示绘图界面按钮
-    void on_showPlotBtn_clicked();
-
 signals:
     // 打开串口信号
     void signal_openSerialPort(QString portName, int baudrate, qint8 dataBits, qint8 stopBits, qint8 parity);

@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // 图形显示界面
-    plot = new Plot();
+    plot = new Plot(ui->mPlot1);
 
     // 协议未确认
     frameChecked = false;
@@ -202,8 +202,7 @@ void MainWindow::loadFrameByFile()
 
 
     // 从ini文件读取协议
-    frameData.clear();
-    QString loadFilename = "./data.obj";
+    QString loadFilename = "data.obj";
     /* 从目录中选择文件，这里不需要，直接从固定文件读取
     // 创建目录
     QString dir = util::createDir("config");
@@ -255,6 +254,7 @@ void MainWindow::on_openPortBtn_clicked(bool checked)
         // 打开串口
 
         // 判断是否确认数据帧
+        loadFrameByFile();
         if(!frameChecked){
             QMessageBox::critical(this, "error", "请先确认数据协议");
             ui->openPortBtn->setChecked(false);
@@ -610,14 +610,3 @@ void MainWindow::LogShow(QString info, bool format){
 
 }
 
-
-void MainWindow::on_showPlotBtn_clicked()
-{
-    bool hidden = plot->isHidden();
-    if(hidden){
-        // 显示绘图界面
-        plot->show();
-    }else{
-        plot->hide();
-    }
-}
