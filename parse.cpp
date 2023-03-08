@@ -55,10 +55,9 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data, bool &fr
             info.curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool();
             info.curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool();
             data->push_back(info);
-        }else if(groupKey=="endian"){
+        }else if(groupKey==INI_OTHER){
             // util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toBool();
             frameLittleEndian = read.value(QString("%1/endian").arg(INI_OTHER)).toBool();
-        }else if(groupKey=="hz"){
             frameHz = read.value(QString("%1/hz").arg(INI_OTHER)).toUInt();
         }
     }
