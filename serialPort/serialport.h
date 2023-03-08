@@ -34,8 +34,6 @@ public:
     // 数据缓冲区
     QByteArray recvBuf;
 
-    util::WriteFile writeFile2;
-
 signals:
     // 获取端口列表信号
     void signal_getPortList(QStringList ports);
