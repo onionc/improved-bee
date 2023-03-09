@@ -98,7 +98,9 @@ namespace DATA{
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
         const QString getDataStr() const{
             QString s;
-            if(!extFuncName.isEmpty()){
+            if(!extFuncName.isEmpty()
+               || accumFlag){
+                // 如果有计算或者有累加，使用double值
                 s = QString("%1").arg(data.t_double);
             }else{
                 switch(type){
@@ -108,8 +110,8 @@ namespace DATA{
                     case EnumClass::t_ushort: s = QString("%1").arg(data.t_ushort); break;
                     case EnumClass::t_int: s = QString("%1").arg(data.t_int); break;
                     case EnumClass::t_uint: s = QString("%1").arg(data.t_uint); break;
-                    case EnumClass::t_float: s = QString("%1").arg(data.t_float); break;
-                    case EnumClass::t_double: s = QString("%1").arg(data.t_double); break;
+                    case EnumClass::t_float: s = QString::number(data.t_float, 'f', 8); break;
+                    case EnumClass::t_double: s = QString::number(data.t_double, 'f', 16); break;
                     default:
                         s = "";
                         break;
