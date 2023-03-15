@@ -47,8 +47,12 @@ private:
     // 三个图表每个里面有几条线，数值为0则图表不绘制
     int chart1, chart2, chart3;
 
+    // 图表数据
+    std::vector<std::vector<QString>> chartInfoArr;
+
     // 三个图形的x计数
     long xCount1, xCount2, xCount3;
+
 
 
     // 初始化图表

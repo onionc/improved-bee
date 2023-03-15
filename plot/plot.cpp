@@ -24,8 +24,14 @@ Plot::~Plot()
 
 // 设置图表中线条个数
 void Plot::setChartNum(std::vector<std::vector<QString>> &chartInfoArr){
+    this->chartInfoArr = chartInfoArr;
     init();
-
+}
+// 初始化图表
+void Plot::init(){
+    initGraph(1);
+    initGraph(2);
+    initGraph(3);
 
     QCustomPlot *qplot;
     chart1 = chart2 = chart3 = 0;
@@ -56,12 +62,6 @@ void Plot::setChartNum(std::vector<std::vector<QString>> &chartInfoArr){
         }
 
     }
-}
-// 初始化图表
-void Plot::init(){
-    initGraph(1);
-    initGraph(2);
-    initGraph(3);
 }
 
 
