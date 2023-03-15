@@ -37,7 +37,7 @@ public:
      * @param chartNum 将三个图表的线条数量返回，十进制的一二三位分别表示
      * @return
      */
-    bool parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg, uint &chartNum);
+    bool parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg, std::vector<std::vector<QString>> &chartInfoArr);
 
     // 从字节数据中找到一帧数据并调用解析：判断帧头、检验和，每次找出一帧数据去解析
     bool findFrameAndParse(QByteArray &allBytes);

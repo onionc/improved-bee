@@ -436,7 +436,8 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         frameFormat(); // 协议转结构体
         QString errorMsg;
         uint chartNum; // 三个图表的线条数量
-        if(!(parse.parseFrameInfo(&frameData, errorMsg, chartNum))){
+        std::vector<std::vector<QString>> chartInfoArr;
+        if(!(parse.parseFrameInfo(&frameData, errorMsg, chartInfoArr))){
             ui->confirmFrameBtn->setChecked(false);
             QMessageBox::critical(this, "error", errorMsg);
             return;
@@ -482,7 +483,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         switchTable(false);
 
         // 初始化图表
-        plot->setChartNum(chartNum%10, chartNum/10%10, chartNum/100%10);
+        plot->setChartNum(chartInfoArr);
 
         frameChecked = true;
 
@@ -707,9 +708,14 @@ void MainWindow::slot_taskScheduler(){
     EnumClass::typeListEnum typeTmp;
 
     // 绘图用变量
-    double key[3]={0}, cv1[3]={0}, cv2[3]={0}, cv3[3]={0};
+    double key[3]={0};
+    std::vector<double> data0, data1, data2;
+
 
     while(recvBuf.size()>=parse.getFrameLen()){
+        data0.clear();
+        data1.clear();
+        data2.clear();
 
         // 找并解析一帧数
         if(parse.findFrameAndParse(recvBuf)){
@@ -852,16 +858,16 @@ void MainWindow::slot_taskScheduler(){
                 }
 
                 // 绘图数据准备
-                if(info->curve1Index>=1 && info->curve1Index<=3){
-                    cv1[info->curve1Index-1] = info->getDataStr().toDouble();
+                if(info->curve0Index>=1 && info->curve0Index<=PLOT_MAX_LINE){
+                    data0.push_back(oneSecData[j].data.t_double);
                 }
 
-                if(info->curve2Index>=1 && info->curve2Index<=3){
-                    cv2[info->curve2Index-1] = info->getDataStr().toDouble();
+                if(info->curve1Index>=1 && info->curve1Index<=PLOT_MAX_LINE){
+                    data1.push_back(oneSecData[j].data.t_double);
                 }
 
-                if(info->curve3Index>=1 && info->curve3Index<=3){
-                    cv3[info->curve3Index-1] = info->getDataStr().toDouble();
+                if(info->curve2Index>=1 && info->curve2Index<=PLOT_MAX_LINE){
+                    data2.push_back(oneSecData[j].data.t_double);
                 }
 
 
@@ -870,9 +876,9 @@ void MainWindow::slot_taskScheduler(){
 
             // 1s 绘图添加数据
             if((dataCount+1)%frameHz==0){
-                plot->plotAddData(1, dataCount, cv1[0], cv1[1], cv1[2]);
-                plot->plotAddData(2, dataCount, cv2[0], cv2[1], cv2[2]);
-                plot->plotAddData(3, dataCount, cv3[0], cv3[1], cv3[2]);
+                plot->plotAddData(1, dataCount, data0);
+                plot->plotAddData(2, dataCount, data1);
+                plot->plotAddData(3, dataCount, data2);
             }
 
             // 写入 1s 数据，并清除使之重新计算

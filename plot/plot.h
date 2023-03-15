@@ -7,6 +7,8 @@
 #include <QPen>
 #include <QVector>
 #include <QDebug>
+#include <QString>
+
 
 namespace Ui {
 class Plot;
@@ -27,19 +29,13 @@ public:
      * @brief plotAddData 图形增加数据
      * @param index 图形索引，1~3 分别代表三个图表
      * @param key x数据
-     * @param value1 y轴数据1
-     * @param value2 y轴数据2
-     * @param value3 z轴数据3
+     * @param value1 y轴数据
      */
-    void plotAddData(int index,
-                      const QVector<double> &key,
-                      const QVector<double> &value1,
-                      const QVector<double> &value2,
-                      const QVector<double> &value3);
-    void plotAddData(int index, double key, double value1=0, double value2=0, double value3=0);
+    void plotAddData(int index, double key, std::vector<double> &data);
 
     // 设置图表中线条个数，并初始化
-    void setChartNum(int chart1Num, int chart2Num, int chart3Num);
+    void setChartNum(std::vector<std::vector<QString>> &chartInfoArr);
+
 private slots:
     void on_pushButton_clicked(bool checked);
     // 清除绘图
