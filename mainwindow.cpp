@@ -855,19 +855,20 @@ void MainWindow::slot_taskScheduler(){
                 if((dataCount+1)%frameHz==0){
                     // 需要用到j, 所以放到for内
                     showTableWidget->item(j, 0)->setText(oneSecData[j].getDataStr());
-                }
 
-                // 绘图数据准备
-                if(info->curve0Index>=1 && info->curve0Index<=PLOT_MAX_LINE){
-                    data0.push_back(oneSecData[j].data.t_double);
-                }
 
-                if(info->curve1Index>=1 && info->curve1Index<=PLOT_MAX_LINE){
-                    data1.push_back(oneSecData[j].data.t_double);
-                }
+                    // 绘图数据准备
+                    if(info->curve0Index>=1 && info->curve0Index<=PLOT_MAX_LINE){
+                        data0.push_back(oneSecData[j].getDataStr().toDouble());
+                    }
 
-                if(info->curve2Index>=1 && info->curve2Index<=PLOT_MAX_LINE){
-                    data2.push_back(oneSecData[j].data.t_double);
+                    if(info->curve1Index>=1 && info->curve1Index<=PLOT_MAX_LINE){
+                        data1.push_back(oneSecData[j].getDataStr().toDouble());
+                    }
+
+                    if(info->curve2Index>=1 && info->curve2Index<=PLOT_MAX_LINE){
+                        data2.push_back(oneSecData[j].getDataStr().toDouble());
+                    }
                 }
 
 

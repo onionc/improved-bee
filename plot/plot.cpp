@@ -56,7 +56,7 @@ void Plot::init(){
             qplot->addGraph();
             qplot->graph(j)->setPen(QPen(QColor(CLEAN_Colors[j])));
             // 显示数据点
-            qplot->graph(j)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
+            qplot->graph(j)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssCircle, 3));
             // 名称
             qplot->graph(j)->setName(chartInfoArr[i][j]);
         }
