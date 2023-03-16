@@ -67,7 +67,7 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data, bool &fr
 
 
 // 协议帧信息解析：查找帧头、校验、帧长
-bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg, uint &chartNum){
+bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &errorMsg, std::vector<std::vector<QString>> &chartInfoArr){
 
     int itmp = 0;
     QString tmp;
@@ -201,9 +201,35 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
             nav.accumFlag = info->accumCheck;
 
             // 绘图标志
-            if(info->curve1 && curve1Count<3){
-                curve1Count++;
-                nav.curve1Index = curve1Count;
+            if(info->curve1){
+                if(chartInfoArr.size()<1){
+                    std::vector<QString> a;
+                    chartInfoArr.push_back(a);
+                }
+                if(chartInfoArr[0].size()<PLOT_MAX_LINE){
+                    chartInfoArr[0].push_back(info->name);
+                    nav.curve0Index = chartInfoArr[0].size();
+                }
+            }
+            if(info->curve2){
+                if(chartInfoArr.size()<2){
+                    std::vector<QString> a;
+                    chartInfoArr.push_back(a);
+                }
+                if(chartInfoArr[1].size()<PLOT_MAX_LINE){
+                    chartInfoArr[1].push_back(info->name);
+                    nav.curve1Index = chartInfoArr[1].size();
+                }
+            }
+            if(info->curve3){
+                if(chartInfoArr.size()<3){
+                    std::vector<QString> a;
+                    chartInfoArr.push_back(a);
+                }
+                if(chartInfoArr[2].size()<PLOT_MAX_LINE){
+                    chartInfoArr[2].push_back(info->name);
+                    nav.curve2Index = chartInfoArr[2].size();
+                }
             }
 
             frameDataArr.push_back(nav);
@@ -225,9 +251,6 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
         errorMsg = QString("脚本加载错误");
         return false;
     }
-
-    // 将三个图表的线条数量返回，十进制的一二三位分别表示
-    chartNum = curve1Count;
 
     return true;
 }

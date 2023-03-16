@@ -73,7 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // 图形显示界面
-    plot = new Plot(ui->mPlot1);
+    qplotArr.push_back(ui->mPlot1);
+    plot = new Plot(&qplotArr);
 
     // 协议未确认
     frameChecked = false;
@@ -199,8 +200,6 @@ void MainWindow::loadFrameByFile()
 {
 
     QString errorMsg;
-    uint chartNum; // 三个图表的线条数量
-
 
     // 从ini文件读取协议
     QString loadFilename = "data.obj";
@@ -217,12 +216,12 @@ void MainWindow::loadFrameByFile()
     */
     parse.loadFromIni(loadFilename, &frameData, frameLittleEndian, frameHz);
     // 协议确认
-    if(!(parse.parseFrameInfo(&frameData, errorMsg, chartNum))){
+    std::vector<std::vector<QString>> chartInfoArr;
+    if(!(parse.parseFrameInfo(&frameData, errorMsg, chartInfoArr))){
         QMessageBox::critical(this, "error", errorMsg);
         return;
     }
 
-    qDebug()<<"chartNum"<<chartNum;
 
     if(frameHz<1 || frameHz>2000){
         QMessageBox::critical(this, "error", "频率获取失败");
@@ -243,7 +242,7 @@ void MainWindow::loadFrameByFile()
     }
 
     // 初始化图表
-    plot->setChartNum(chartNum);
+    plot->setChartNum(chartInfoArr);
 
     frameChecked = true;
 }
@@ -404,10 +403,14 @@ void MainWindow::slot_taskScheduler(){
     EnumClass::typeListEnum typeTmp;
 
     // 绘图用变量
-    double key[3]={0}, cv1[3]={0}, cv2[3]={0}, cv3[3]={0};
+   double key[3]={0};
+   std::vector<double> data0, data1, data2;
 
-    while(recvBuf.size()>=parse.getFrameLen()){
 
+   while(recvBuf.size()>=parse.getFrameLen()){
+       data0.clear();
+       data1.clear();
+       data2.clear();
         // 找并解析一帧数
         if(parse.findFrameAndParse(recvBuf)){
             navData = parse.getNavData();
@@ -546,29 +549,30 @@ void MainWindow::slot_taskScheduler(){
                 if((dataCount+1)%frameHz==0){
                     // 需要用到j, 所以放到for内
                     ui->tableWidget->item(j, 0)->setText(oneSecData[j].getDataStr());
-                    qDebug()<<"j:"<<j<<" value="<<oneSecData[j].getDataStr();
-                }
 
-                // 绘图数据准备
-                if(info->curve1Index>=1 && info->curve1Index<=3){
-                    cv1[info->curve1Index-1] = info->getDataStr().toDouble();
-                }
 
-                if(info->curve2Index>=1 && info->curve2Index<=3){
-                    cv2[info->curve2Index-1] = info->getDataStr().toDouble();
-                }
+                    // 绘图数据准备
+                    if(info->curve0Index>=1 && info->curve0Index<=PLOT_MAX_LINE){
+                        data0.push_back(oneSecData[j].getDataStr().toDouble());
+                    }
 
-                if(info->curve3Index>=1 && info->curve3Index<=3){
-                    cv3[info->curve3Index-1] = info->getDataStr().toDouble();
-                }
+                    if(info->curve1Index>=1 && info->curve1Index<=PLOT_MAX_LINE){
+                        data1.push_back(oneSecData[j].getDataStr().toDouble());
+                    }
 
+                    if(info->curve2Index>=1 && info->curve2Index<=PLOT_MAX_LINE){
+                        data2.push_back(oneSecData[j].getDataStr().toDouble());
+                    }
+                }
 
             }
 
 
             // 1s 绘图添加数据
             if((dataCount+1)%frameHz==0){
-                plot->plotAddData(1, dataCount, cv1[0], cv1[1], cv1[2]);
+                plot->plotAddData(0, dataCount, data0);
+                plot->plotAddData(1, dataCount, data1);
+                plot->plotAddData(2, dataCount, data2);
             }
 
             // 写入 1s 数据，并清除使之重新计算

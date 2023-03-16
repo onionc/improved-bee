@@ -14,6 +14,11 @@
 #define DEFAULT_HZ 200
 #define INI_OTHER "Other"
 
+
+#define PLOT_MAX_LINE 10 // 每个图表中最多线条数
+// 颜色
+static char CLEAN_Colors[][8] = {"#ed1299", "#09f9f5", "#246b93", "#cc8e12", "#d561dd", "#c93f00", "#ddd53e", "#4aef7b", "#e86502", "#9ed84e", "#39ba30", "#6ad157", "#8249aa", "#99db27", "#e07233", "#ff523f","#ce2523", "#f7aa5d", "#cebb10", "#03827f", "#931635", "#373bbf", "#a1ce4c", "#ef3bb6", "#d66551","#1a918f", "#ff66fc", "#2927c4", "#7149af" ,"#57e559" ,"#8e3af4" ,"#f9a270" ,"#22547f", "#db5e92","#edd05e", "#6f25e8", "#0dbc21", "#280f7a", "#6373ed", "#5b910f" ,"#7b34c1" ,"#0cf29a" ,"#d80fc1","#dd27ce", "#07a301", "#167275", "#391c82", "#2baeb5","#925bea", "#63ff4f"};
+
 // 通过枚举类型获取字符串
 #define typeS(a) DATA::typeListStr(a)
 #define checkS(a) DATA::checkSumListStr(a)
@@ -90,10 +95,10 @@ namespace DATA{
         // 是否为累加值，true：1s数据是求和），false：瞬时值
         bool accumFlag = false;
 
-        // 绘图，共三个图形框，每个图形下最多有三种数据
-        quint8 curve1Index = 0; // 从1开始（1~3），代表第几种数据
+        // 绘图，共三个图表框，每个图形下最多有PLOT_MAX_LINE条数据
+        quint8 curve0Index = 0; // （0~2），代表第1个图表的第几条线
+        quint8 curve1Index = 0;
         quint8 curve2Index = 0;
-        quint8 curve3Index = 0;
 
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
         const QString getDataStr() const{

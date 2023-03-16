@@ -81,6 +81,8 @@ private:
     // 图形显示
     Plot *plot = nullptr;
 
+    std::vector<QCustomPlot*> qplotArr;
+
 private slots:
     // ---- 数据协议 ----
 

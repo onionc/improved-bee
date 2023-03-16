@@ -1,10 +1,9 @@
 #include "plot.h"
 
 
-Plot::Plot(QCustomPlot *mPlot)
+Plot::Plot(std::vector<QCustomPlot*> *mPlotArr)
 {
-    this->qplot = mPlot;
-    chart1=0;
+    this->qplotArr = mPlotArr;
 }
 
 Plot::~Plot()
@@ -12,45 +11,37 @@ Plot::~Plot()
 }
 
 // 设置图表中线条个数
-void Plot::setChartNum(int chart1Num){
-    if(chart1Num<1){
-        chart1Num = 0;
-    }else if(chart1Num>3){
-        chart1Num = 3;
+void Plot::setChartNum(std::vector<std::vector<QString>> &chartInfoArr){
+    this->chartInfoArr = chartInfoArr;
+    init();
+}
+// 初始化图表
+void Plot::init(){
+    xCountArr.clear();
+
+    // 第i个图表，第j条线
+    for(int i=0; i<qplotArr->size() || i<chartInfoArr.size(); i++){
+        QCustomPlot *qplot = qplotArr->at(i);
+        initGraph(qplot);
+        xCountArr.push_back(0); // x计数
+        for(int j=0; j<chartInfoArr[i].size(); j++){
+            // 增加线条
+            qplot->addGraph();
+            qplot->graph(j)->setPen(QPen(QColor(CLEAN_Colors[j])));
+            // 显示数据点
+            qplot->graph(j)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssCircle, 3));
+            // 名称
+            qplot->graph(j)->setName(chartInfoArr[i][j]);
+
+        }
     }
-
-    chart1 = chart1Num;
-
-    initGraph();
 }
 
 
-void Plot::initGraph(){
+void Plot::initGraph(QCustomPlot *qplot){
 
     // 清除
     qplot->clearGraphs();
-
-
-
-    if(chart1>0){
-        // 增加线条
-        qplot->addGraph();
-        qplot->graph(0)->setPen(QPen(Qt::red));
-        // 显示数据点
-        qplot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
-    }
-    if(chart1>1){
-        qplot->addGraph();
-        qplot->graph(1)->setPen(QPen(Qt::blue));
-
-        qplot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
-    }
-    if(chart1>2){
-        qplot->addGraph();
-        qplot->graph(2)->setPen(QPen(Qt::darkGreen));
-
-        qplot->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ScatterShape::ssPlus, 5));
-    }
 
     // 自动设置界面范围
     qplot->rescaleAxes();
@@ -66,7 +57,7 @@ void Plot::initGraph(){
     qplot->axisRect()->insetLayout()->setInsetAlignment(0,Qt::AlignTop|Qt::AlignLeft); // 左上角
     // 设置图例字体及大小
     QFont legendFont = QFont();
-    legendFont.setPointSize(10);
+    legendFont.setPointSize(9);
     legendFont.setFamily("Times New Roman");
     qplot->legend->setFont(legendFont);
     // 设置被选中项的字体及颜色
@@ -91,47 +82,39 @@ void Plot::initGraph(){
     // 鼠标放入绘图区，变手形状
     qplot->setCursor(QCursor(Qt::PointingHandCursor));
 
-    // 计数清空
-    xCount1 = xCount2 = xCount3 = 0;
 
-    // 图例默认不显示
-    qplot->legend->setVisible(false);
+    // 图例默认显示
+    qplot->legend->setVisible(true);
 
     // 重绘
     qplot->replot();
 }
 
 
-void Plot::plotAddData(int index, double key, double value1, double value2, double value3){
+void Plot::plotAddData(int index, double key, std::vector<double> &data){
 
-    if(index!=1){  // 只允许有一个图表
+    if(index<0 || index>=qplotArr->size() || index>=chartInfoArr.size()){
         return;
     }
 
-    long count = 0; // x轴计数
+    QCustomPlot *qplot = qplotArr->at(index);
+    int chartNum = chartInfoArr[index].size(); // 线条数量
 
-    count = ++xCount1;
+    xCountArr[index]++;
 
-
-    if(chart1>0){
-        qplot->graph(0)->addData(count, value1);
-        if(chart1>1){
-            qplot->graph(1)->addData(count, value2);
-        }
-        if(chart1>2){
-            qplot->graph(2)->addData(count, value3);
-        }
-
-        // 自适应大小
-        qplot->rescaleAxes(true);
-        // 放大区间，使数据边界进入图形内
-        double dCenter = qplot->yAxis->range().center();
-        if(fabs(dCenter)>1e-5){ // 接近0的不缩放，0会触发问题一直缩放刻度的bug
-            qplot->yAxis->scaleRange(1.1, dCenter);
-        }
-
-        // 重绘
-        qplot->replot(QCustomPlot::rpQueuedReplot);
+    for(int i=0; i<chartNum && i<data.size(); i++){
+        qplot->graph(i)->addData(xCountArr[index], data[i]);
     }
+
+    // 自适应大小
+    qplot->rescaleAxes(true);
+    // 放大区间，使数据边界进入图形内
+    double dCenter = qplot->yAxis->range().center();
+    if(fabs(dCenter)>1e-5){ // 接近0的不缩放，0会触发问题一直缩放刻度的bug
+        qplot->yAxis->scaleRange(1.1, dCenter);
+    }
+
+    // 重绘
+    qplot->replot(QCustomPlot::rpQueuedReplot);
 }
 
