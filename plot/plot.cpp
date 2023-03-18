@@ -20,7 +20,7 @@ void Plot::init(){
     xCountArr.clear();
 
     // 第i个图表，第j条线
-    for(int i=0; i<qplotArr->size() || i<chartInfoArr.size(); i++){
+    for(int i=0; i<qplotArr->size() && i<chartInfoArr.size(); i++){
         QCustomPlot *qplot = qplotArr->at(i);
         initGraph(qplot);
         xCountArr.push_back(0); // x计数
