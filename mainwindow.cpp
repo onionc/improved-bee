@@ -735,9 +735,7 @@ void MainWindow::slot_taskScheduler(){
                 // 1s 计数判断
                 if(dataCount%frameHz==0){
                     // 清空数据
-                    //NAV_Data infoT;
                     oneSecData.push_back(*info);
-                    //memset(&infoT.data, 0, sizeof(infoT.data));
 
                     flag1sUpdate = false;
                 }else{
@@ -745,9 +743,7 @@ void MainWindow::slot_taskScheduler(){
                 }
                 // 10s 计数判断
                 if(dataCount%(frameHz*10)==0){
-                    //NAV_Data infoT;
                     tenSecData.push_back(*info);
-                    //memset(&infoT.data, 0, sizeof(infoT.data));
 
                     flag10sUpdate = false;
                 }else{
