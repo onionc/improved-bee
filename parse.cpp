@@ -551,7 +551,7 @@ unsigned short Parse::Crc16Xmode(const char *q, int len)
 
 
 // 帧数据写入文件
-void Parse::writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool addHeader){
+void Parse::writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool addHeader, bool navFlag){
     QString header="", line="";
     int size = navData->size();
     for(int i=0; i<size; i++){
@@ -564,7 +564,7 @@ void Parse::writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool 
             }
         }
 
-        line += navData->value(i).getDataStr();
+        line += navData->value(i).getDataStr(navFlag);
 
         // 最后一列数据无逗号
         if(i<size-1){

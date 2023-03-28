@@ -55,7 +55,7 @@ public:
     }
 
     // 帧数据写入文件
-    void writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool addHeader=false);
+    void writeFile(std::ofstream *fp, const QVector<NAV_Data>* navData, bool addHeader=false, bool navFlag=false);
 
 private:
     // 校验数据，checkDataBytes 为要校验的数据，checkBytes 为校验字节

@@ -101,12 +101,12 @@ namespace DATA{
         quint8 curve2Index = 0;
 
         // 获取数据（字符串格式），需要具体获取到对应类型数据，需要检查type，再调用data相应字段
-        const QString getDataStr() const{
+        const QString getDataStr(bool navFlag=false) const{
             QString s;
             if(!extFuncName.isEmpty()
-               || accumFlag){
-                // 如果有计算或者有累加，使用double值
-                s = QString("%1").arg(data.t_double);
+               || (!navFlag  && accumFlag)  ){
+                // 如果有计算或者有非一帧的累加，使用double值
+                s = QString::number(data.t_double, 'f', 16);
             }else{
                 switch(type){
                     case EnumClass::t_char: s = QString("%1").arg(data.t_char); break;

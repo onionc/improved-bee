@@ -723,7 +723,7 @@ void MainWindow::slot_taskScheduler(){
 
             // 保存一帧数据
             if(bSaveRawFlag){
-                parse.writeFile(fNavDataFile.ostrm, navData);
+                parse.writeFile(fNavDataFile.ostrm, navData, false, true);
             }
 
             if(frameHz<=0) continue;
@@ -734,16 +734,22 @@ void MainWindow::slot_taskScheduler(){
 
                 // 1s 计数判断
                 if(dataCount%frameHz==0){
-                    // 每1s第一帧写入基础数据
+                    // 清空数据
+                    //NAV_Data infoT;
                     oneSecData.push_back(*info);
+                    //memset(&infoT.data, 0, sizeof(infoT.data));
+
                     flag1sUpdate = false;
                 }else{
                     flag1sUpdate = true;
                 }
                 // 10s 计数判断
                 if(dataCount%(frameHz*10)==0){
+                    //NAV_Data infoT;
                     tenSecData.push_back(*info);
-                    flag1sUpdate = false;
+                    //memset(&infoT.data, 0, sizeof(infoT.data));
+
+                    flag10sUpdate = false;
                 }else{
                     flag10sUpdate = true;
                 }
@@ -757,93 +763,108 @@ void MainWindow::slot_taskScheduler(){
 
                             // 1s 10s 求和
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_char;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_char;
+                            else oneSecData[j].data.t_double = info->data.t_char; // 第一次
+
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_char;
+                            else tenSecData[j].data.t_double = info->data.t_char;
 
                             // 10s有个特殊过程，求之前数据累加和的平均
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
                             // 瞬时值
-                            if(flag1sUpdate)  oneSecData[j].data.t_char = info->data.t_char;
-                            if(flag10sUpdate) tenSecData[j].data.t_char = info->data.t_char;
+                            oneSecData[j].data.t_char = info->data.t_char;
+                            tenSecData[j].data.t_char = info->data.t_char;
                         }
 
                         break;
                     case EnumClass::t_uchar:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_uchar;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_uchar;
+                            else oneSecData[j].data.t_double = info->data.t_uchar;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_uchar;
+                            else tenSecData[j].data.t_double = info->data.t_uchar;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_uchar = info->data.t_uchar;
-                            if(flag10sUpdate) tenSecData[j].data.t_uchar = info->data.t_uchar;
+                            oneSecData[j].data.t_uchar = info->data.t_uchar;
+                            tenSecData[j].data.t_uchar = info->data.t_uchar;
                         }
 
                         break;
                     case EnumClass::t_short:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_short;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_short;
+                            else oneSecData[j].data.t_double = info->data.t_short;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_short;
+                            else tenSecData[j].data.t_double = info->data.t_short;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_short = info->data.t_short;
-                            if(flag10sUpdate) tenSecData[j].data.t_short = info->data.t_short;
+                            oneSecData[j].data.t_short = info->data.t_short;
+                            tenSecData[j].data.t_short = info->data.t_short;
                         }
                         break;
                     case EnumClass::t_ushort:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_ushort;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_ushort;
+                            else oneSecData[j].data.t_double = info->data.t_ushort;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_ushort;
+                            else tenSecData[j].data.t_double = info->data.t_ushort;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_ushort = info->data.t_ushort;
-                            if(flag10sUpdate) tenSecData[j].data.t_ushort = info->data.t_ushort;
+                            oneSecData[j].data.t_ushort = info->data.t_ushort;
+                            tenSecData[j].data.t_ushort = info->data.t_ushort;
                         }
                         break;
                     case EnumClass::t_int:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_int;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_int;
+                            else oneSecData[j].data.t_double = info->data.t_int;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_int;
+                            else tenSecData[j].data.t_double = info->data.t_int;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_int = info->data.t_int;
-                            if(flag10sUpdate) tenSecData[j].data.t_int = info->data.t_int;
+                            oneSecData[j].data.t_int = info->data.t_int;
+                            tenSecData[j].data.t_int = info->data.t_int;
                         }
                         break;
                     case EnumClass::t_uint:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_uint;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_uint;
+                            else oneSecData[j].data.t_double = info->data.t_uint;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_uint;
+                            else tenSecData[j].data.t_double = info->data.t_uint;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_uint = info->data.t_uint;
-                            if(flag10sUpdate) tenSecData[j].data.t_uint = info->data.t_uint;
+                            oneSecData[j].data.t_uint = info->data.t_uint;
+                            tenSecData[j].data.t_uint = info->data.t_uint;
                         }
                         break;
                     case EnumClass::t_float:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_float;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_float;
+                            else oneSecData[j].data.t_double = info->data.t_float;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_float;
+                            else tenSecData[j].data.t_double = info->data.t_float;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_float = info->data.t_float;
-                            if(flag10sUpdate) tenSecData[j].data.t_float = info->data.t_float;
+                            oneSecData[j].data.t_float = info->data.t_float;
+                            tenSecData[j].data.t_float = info->data.t_float;
                         }
                         break;
                     case EnumClass::t_double:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_double;
-                            if(flag10sUpdate) tenSecData[j].data.t_double += info->data.t_double;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_double;
 
                             if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
                         }else{
-                            if(flag1sUpdate)  oneSecData[j].data.t_double = info->data.t_double;
-                            if(flag10sUpdate) tenSecData[j].data.t_double = info->data.t_double;
+                            oneSecData[j].data.t_double = info->data.t_double;
+                            tenSecData[j].data.t_double = info->data.t_double;
                         }
                         break;
                     default:
