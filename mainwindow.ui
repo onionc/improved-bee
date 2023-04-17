@@ -931,6 +931,28 @@
             <bool>false</bool>
            </property>
           </widget>
+          <widget class="QPushButton" name="showAttitudeBtn">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>50</y>
+             <width>75</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>姿态角显示</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+          </widget>
          </widget>
         </widget>
        </item>

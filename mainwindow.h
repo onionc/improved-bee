@@ -18,6 +18,7 @@
 #include "parse.h"
 #include "datatype.h"
 #include "plot/plot.h"
+#include "plot/attitude.h"
 
 
 namespace Ui {
@@ -79,6 +80,7 @@ private:
 
     // 图形显示
     Plot *plot = nullptr;
+    Attitude *attitude = nullptr;
 
 private slots:
     // ---- 数据协议 ----
@@ -115,6 +117,8 @@ private slots:
 
     // 显示绘图界面按钮
     void on_showPlotBtn_clicked();
+
+    void on_showAttitudeBtn_clicked();
 
 signals:
     // 打开串口信号

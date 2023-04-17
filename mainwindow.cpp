@@ -139,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 图形显示界面
     plot = new Plot();
+    attitude = new Attitude();
 
     // 协议未确认
     frameChecked = false;
@@ -146,6 +147,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // 文件
     bSaveRawFlag = bSave1sFlag = bSave10sFlag = false;
 
+    // 主窗口关闭时，关闭子窗口
+    setAttribute(Qt::WA_QuitOnClose, true);
+    plot->setAttribute(Qt::WA_QuitOnClose, false);
+    attitude->setAttribute(Qt::WA_QuitOnClose, false);
 }
 
 MainWindow::~MainWindow()
@@ -940,7 +945,7 @@ void MainWindow::LogShow(QString info, bool format){
 
 }
 
-
+// 显示绘制线条界面
 void MainWindow::on_showPlotBtn_clicked()
 {
     bool hidden = plot->isHidden();
@@ -950,4 +955,15 @@ void MainWindow::on_showPlotBtn_clicked()
     }else{
         plot->hide();
     }
+}
+
+// 显示姿态角图形
+void MainWindow::on_showAttitudeBtn_clicked()
+{
+    if(attitude->isHidden()){
+        attitude->show();
+    }else{
+        attitude->hide();
+    }
+
 }

@@ -10,9 +10,6 @@ Plot::Plot(QWidget *parent) :
     ui->setupUi(this);
     // 标题
     setWindowTitle("绘图");
-    // 主窗口关闭时，关闭子窗口
-    setAttribute(Qt::WA_QuitOnClose, false);
-
 
     chart1=chart2=chart3=0;
 }

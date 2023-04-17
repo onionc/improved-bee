@@ -7,7 +7,8 @@
 
 QT       += core gui \
             serialport \
-            printsupport
+            printsupport \
+            svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -40,7 +41,8 @@ SOURCES += \
     parse.cpp \
     luaScript/LuaScript.cpp \
     plot/plot.cpp \
-    plot/qcustomplot.cpp
+    plot/qcustomplot.cpp \
+    plot/attitude.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -55,17 +57,19 @@ HEADERS += \
     parse.h \
     luaScript/LuaScript.h \
     plot/plot.h \
-    plot/qcustomplot.h
+    plot/qcustomplot.h \
+    plot/attitude.h
 
 FORMS += \
         mainwindow.ui \
-    plot/plot.ui
+    plot/plot.ui \
+    plot/attitude.ui
 
 RESOURCES += \
     res.qrc
 
 INCLUDEPATH += $$PWD/include
-
+include($$PWD/include/qfi/qfi.pri)
 
 LIBS += $$INCLUDEPATH/lua/liblualib.a
 
