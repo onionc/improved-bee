@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     endian<<"小端"<<"大端";
     ui->endian_comboBox->addItems(endian);
     ui->endian_comboBox->setCurrentIndex(0);
-    hz<<"1"<<"5"<<"10"<<"20"<<"50"<<"100"<<"200"<<"500"<<"1000"<<"2000";
+    hz<<"1"<<"5"<<"10"<<"20"<<"50"<<"100"<<"200"<<"400"<<"500"<<"1000"<<"2000";
     ui->hz_comboBox->addItems(hz);
     ui->hz_comboBox->setCurrentText(QString("%1").arg(DEFAULT_HZ));
 
