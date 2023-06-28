@@ -119,7 +119,11 @@ private slots:
     void on_showPlotBtn_clicked();
 
     void on_showAttitudeBtn_clicked();
-
+    // 发送命令
+    void on_sendCommandBtn_clicked();
+    // 解析数据
+    // void on_parseDataBtn_clicked();
+    
 signals:
     // 打开串口信号
     void signal_openSerialPort(QString portName, int baudrate, qint8 dataBits, qint8 stopBits, qint8 parity);

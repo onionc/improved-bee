@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 串口设置
     QStringList baudrate, dataBit, stopBit, parity;
-    baudrate<<"4800"<<"9600"<<"19200"<<"115200"<<"230400"<<"921600";
+    baudrate<<"4800"<<"9600"<<"19200"<<"115200"<<"230400"<<"460800"<<"921600";
     ui->baudrate_comboBox->addItems(baudrate);
     ui->baudrate_comboBox->setCurrentText("115200");
     dataBit<<"5"<<"6"<<"7"<<"8";
@@ -966,4 +966,39 @@ void MainWindow::on_showAttitudeBtn_clicked()
         attitude->hide();
     }
 
+}
+/*
+void MainWindow::on_parseDataBtn_clicked()
+{
+
+}
+*/
+
+void MainWindow::on_sendCommandBtn_clicked()
+{
+    QString commandStr = ui->CommandEdit->text();
+    QByteArray commandBytes;
+    if(!commandStr.isEmpty()){
+        // 命令是16进制字符串，转为字节数
+        commandBytes = QByteArray::fromHex(commandStr.toUtf8());
+
+        if(commandStr == commandBytes.toHex()){
+            // 数据格式正确
+
+            if(serialPort->qSerialPort->write(commandBytes, commandBytes.size())>0){
+                // 发送成功
+            }else{
+                // 发送失败
+                QMessageBox::critical(this, "错误", "数据发送失败");
+            }
+        }else{
+            // 数据格式有误
+            QMessageBox::critical(this, "错误", "数据格式错误，请检查");
+        }
+
+    }else{
+        QMessageBox::critical(this, "错误", "数据不能为空");
+    }
+
+    return;
 }
