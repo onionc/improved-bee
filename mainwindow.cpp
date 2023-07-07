@@ -982,7 +982,7 @@ void MainWindow::on_sendCommandBtn_clicked()
         // 命令是16进制字符串，转为字节数
         commandBytes = QByteArray::fromHex(commandStr.toUtf8());
 
-        if(commandStr == commandBytes.toHex()){
+        if(commandStr.toLower() == commandBytes.toHex()){
             // 数据格式正确
 
             if(serialPort->qSerialPort->write(commandBytes, commandBytes.size())>0){
