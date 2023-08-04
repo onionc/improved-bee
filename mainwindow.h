@@ -21,6 +21,9 @@
 #include "plot/attitude.h"
 
 
+// 增加测试状态。定义了MODE_TEST则为开发板，否则为发行版（从文件读取协议）
+// #define MODE_TEST
+
 namespace Ui {
 class MainWindow;
 }
@@ -97,6 +100,8 @@ private slots:
     void on_saveFrameBtn_clicked();
     // 加载协议
     void on_loadFrameBtn_clicked();
+    // 从文件中读取协议，确认数据帧
+    void loadFrameByFile();
     // 清空表格
     void clearTable();
     // 确认数据协议

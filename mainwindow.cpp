@@ -48,12 +48,22 @@ MainWindow::MainWindow(QWidget *parent) :
     showTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->verticalLayout_2->addWidget(showTableWidget); // 添加到布局内
 
-
+#ifdef MODE_TEST
+    // 开发版本
     switchTable(true); // 隐藏表格2，只显示编辑框
-
     // toolBox控制界面设置
     ui->panelBox->setCurrentIndex(0); // 默认第一页
+#else
+    // 发行版本
+    switchTable(false); // 展示表格，不显示编辑框
 
+    // toolBox控制界面设置
+    // 隐藏第一页
+    ui->panelBox->setItemEnabled(0, false);
+    ui->panelBox->setItemText(0, "");
+    ui->panelBox->setCurrentIndex(1); // 默认第2页
+
+#endif
 
     // 日志
     util::logInit();
@@ -402,11 +412,11 @@ void MainWindow::on_loadFrameBtn_clicked()
     clearTable();
 
     // 从ini文件读取协议
-    parse.loadFromIni(loadFilename, &frameData);
+    parse.loadFromIni(loadFilename, &frameData, frameLittleEndian, frameHz);
     // 读取其他字段
     // 其他配置：字节序、频率，会通过槽函数更新变量
-    ui->endian_comboBox->setCurrentIndex(util::readIni(loadFilename, QString("%1/endian").arg(INI_OTHER)).toBool()?0:1);
-    ui->hz_comboBox->setCurrentText(util::readIni(loadFilename, QString("%1/hz").arg(INI_OTHER)).toString());
+    ui->endian_comboBox->setCurrentIndex(frameLittleEndian?0:1);
+    ui->hz_comboBox->setCurrentText(QString::number(frameHz));
 
     // 显示到table
     QString name, data;
@@ -460,7 +470,7 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
         // 帧长显示
         ui->frameLenlabel->setText(QString("%1").arg(parse.getFrameLen()));
 
-        util::smallEndian = frameLittleEndian; // 字节序赋值
+        util::smallEndian = frameLittleEndian; // 字节序赋值，解析时用
 
         // 设置界面
         ui->confirmFrameBtn->setText("编辑数据协议");
@@ -509,6 +519,56 @@ void MainWindow::on_confirmFrameBtn_clicked(bool checked)
     }
 }
 
+// 从文件中读取协议，并确认数据帧
+void MainWindow::loadFrameByFile()
+{
+
+    QString errorMsg;
+    uint chartNum; // 三个图表的线条数量
+    std::vector<std::vector<QString>> chartInfoArr;
+
+    // 从ini文件读取协议
+    QString loadFilename = "data.dll";
+
+    parse.loadFromIni(loadFilename, &frameData, frameLittleEndian, frameHz);
+
+    if(!(parse.parseFrameInfo(&frameData, errorMsg, chartInfoArr))){
+        ui->confirmFrameBtn->setChecked(false);
+        QMessageBox::critical(this, "error", errorMsg);
+        return;
+    }
+
+    if(frameHz<1 || frameHz>2000){
+        QMessageBox::critical(this, "error", "频率获取失败");
+        return;
+    }
+
+    // 帧长显示
+    ui->frameLenlabel->setText(QString("%1").arg(parse.getFrameLen()));
+
+    util::smallEndian = frameLittleEndian; // 字节序赋值，解析时用
+
+
+    // 设置显示数据用的表格
+    QStringList headerText;
+    for(int i=0; i<parse.getNavData()->size(); i++){
+        headerText << parse.getNavData()->value(i).name;
+    }
+    showTableWidget->setRowCount(headerText.count());
+    showTableWidget->setVerticalHeaderLabels(headerText); // 设置竖直表头数据
+    for(int i=0; i<parse.getNavData()->size(); i++){
+        showTableWidget->setItem(i, 0,new QTableWidgetItem());
+    }
+
+    // 切换表格
+    switchTable(false);
+
+    // 初始化图表
+    plot->setChartNum(chartInfoArr);
+
+    frameChecked = true;
+}
+
 // 切换表格的显示
 void MainWindow::switchTable(bool formatPage){
     if(formatPage){
@@ -545,6 +605,10 @@ void MainWindow::on_openPortBtn_clicked(bool checked)
         // 打开串口
 
         // 判断是否确认数据帧
+        #ifndef MODE_TEST
+            // 发行版从文件读取
+            loadFrameByFile();
+        #endif
         if(!frameChecked){
             QMessageBox::critical(this, "error", "请先确认数据协议");
             ui->openPortBtn->setChecked(false);

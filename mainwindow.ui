@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>850</width>
     <height>470</height>
    </rect>
   </property>
@@ -33,13 +33,13 @@
           <property name="minimumSize">
            <size>
             <width>225</width>
-            <height>0</height>
+            <height>330</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>225</width>
-            <height>16777215</height>
+            <height>165000</height>
            </size>
           </property>
           <property name="font">
@@ -76,8 +76,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>202</width>
-             <height>206</height>
+             <width>219</width>
+             <height>225</height>
             </rect>
            </property>
            <attribute name="icon">
@@ -386,8 +386,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>174</width>
-             <height>203</height>
+             <width>219</width>
+             <height>225</height>
             </rect>
            </property>
            <attribute name="icon">
@@ -687,8 +687,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>186</width>
-             <height>193</height>
+             <width>219</width>
+             <height>225</height>
             </rect>
            </property>
            <attribute name="icon">
@@ -788,13 +788,13 @@
           <property name="minimumSize">
            <size>
             <width>225</width>
-            <height>100</height>
+            <height>60</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>225</width>
-            <height>100</height>
+            <height>400</height>
            </size>
           </property>
           <property name="frameShadow">
