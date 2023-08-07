@@ -161,6 +161,13 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_QuitOnClose, true);
     plot->setAttribute(Qt::WA_QuitOnClose, false);
     attitude->setAttribute(Qt::WA_QuitOnClose, false);
+
+    // 标题设置
+    QString title = util::readIni("config.ini", "Main/title").toString();
+    if(!title.isEmpty()){
+        this->setWindowTitle(title);
+    }
+
 }
 
 MainWindow::~MainWindow()

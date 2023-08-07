@@ -227,5 +227,6 @@ void util::writeIni(QString saveFilename, QString key, QVariant value){
 QVariant util::readIni(QString readFilename, QString key){
     // 打开ini文件
     QSettings read(readFilename, QSettings::IniFormat);
+    read.setIniCodec(QTextCodec::codecForName("UTF-8"));
     return read.value(key);
 }
