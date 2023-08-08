@@ -130,9 +130,9 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                     // 不做具体校验，只是为了有默认值
                     break;
                 case EnumClass::c_add8:
-                    frameCheckLen = 1;
-                    break;
+                case EnumClass::c_add8_0:
                 case EnumClass::c_xor8:
+                case EnumClass::c_xor8_0:
                     frameCheckLen = 1;
                     break;
                 case EnumClass::c_crc16_xmodem:
@@ -347,8 +347,17 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
 
     switch(frameCheckSumType){
         case EnumClass::c_add8:
+        case EnumClass::c_add8_0:
             if(cSize==1){
-                result[0] = checkBytes.at(0);
+                result[0] = checkBytes.at(0); // 校验值
+                // 计算
+                r[0] = 0;
+                if(frameCheckSumType == EnumClass::c_add8_0){
+                    // 计算帧头
+                    for(int i=0; i<frameHeaderLen; i++){
+                        r[0] += frameHeaderArr[i];
+                    }
+                }
                 for(int i=0; i<size; i++){
                     r[0]+=(quint8)checkDataBytes[i];
                 };
@@ -359,8 +368,18 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
 
             break;
         case EnumClass::c_xor8:
+        case EnumClass::c_xor8_0:
             if(cSize==1){
-                result[0] = checkBytes.at(0);
+                result[0] = checkBytes.at(0); // 校验值
+                // 计算
+                r[0] = 0;
+                if(frameCheckSumType == EnumClass::c_add8_0){
+                    // 计算帧头
+                    for(int i=0; i<frameHeaderLen; i++){
+                        result[0] ^= frameHeaderArr[i];
+                    }
+                }
+
                 for(int i=0; i<size; i++){
                     r[0]^=(quint8)checkDataBytes[i];
                 };

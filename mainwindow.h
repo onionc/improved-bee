@@ -22,7 +22,7 @@
 
 
 // 增加测试状态。定义了MODE_TEST则为开发板，否则为发行版（从文件读取协议）
-// #define MODE_TEST
+#define MODE_TEST
 
 namespace Ui {
 class MainWindow;

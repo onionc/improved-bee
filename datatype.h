@@ -36,7 +36,7 @@ namespace DATA{
 
 
         // 校验类型列表
-        enum checkSumListEnum{None=0, c_add8, c_xor8, c_crc16_xmodem};
+        enum checkSumListEnum{None=0, c_add8, c_add8_0, c_xor8, c_xor8_0, c_crc16_xmodem}; // c_add8为数据的一个字节累加和，c_add8_0 为包含帧头和数据的一个字节累加和
         Q_ENUM(checkSumListEnum)
 
     };
