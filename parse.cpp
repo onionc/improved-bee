@@ -290,8 +290,11 @@ bool Parse::findFrameAndParse(QByteArray &allBytes){
                      * 比如在协议头 AA BB xx xx xx 下有数据 0x 11 22 33 AA AA ，应该保留数据的最后一个AA
                      *
                      */
-                    dataIndex = startIndex+1;
-                    j--; // 需要重新查同样的子串，撤回一个字节
+                    //dataIndex = startIndex+1;
+                    //j--; // 需要重新查同样的子串，撤回一个字节
+
+                    // 上面的逻辑在协议不一致时就会卡顿，所以改为找到子串不在末尾的，不做操作，继续在末尾找
+
                 }
             }
 
