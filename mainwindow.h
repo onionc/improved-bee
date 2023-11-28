@@ -19,7 +19,7 @@
 #include "datatype.h"
 #include "plot/plot.h"
 #include "plot/attitude.h"
-
+#include "parsethread.h"
 
 // 增加测试状态。定义了MODE_TEST则为开发板，否则为发行版（从文件读取协议）
 #define MODE_TEST
@@ -67,6 +67,7 @@ private:
     QVector<NAV_Data> oneSecData; // 1s的数据
     QVector<NAV_Data> tenSecData; // 10s的数据
     quint64 dataCount; // 计数
+    void parseOneFrame(QByteArray &recvBuf); // 解析一帧数据
 
 
     // 存储文件
@@ -84,6 +85,9 @@ private:
     // 图形显示
     Plot *plot = nullptr;
     Attitude *attitude = nullptr;
+
+    // 解析文件线程
+    ParseThread *parseThread;
 
 private slots:
     // ---- 数据协议 ----
@@ -127,8 +131,12 @@ private slots:
     // 发送命令
     void on_sendCommandBtn_clicked();
     // 解析数据
-    // void on_parseDataBtn_clicked();
-    
+    void on_parseDataBtn_clicked();
+
+    // 解析线程进度条和通知
+    void slot_parseProgress(int i);
+    void slot_parseMsg(QString msg);
+
 signals:
     // 打开串口信号
     void signal_openSerialPort(QString portName, int baudrate, qint8 dataBits, qint8 stopBits, qint8 parity);

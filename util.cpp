@@ -123,6 +123,14 @@ void util::WriteFile::write(QByteArray arr){
     }
 }
 
+void util::WriteFile::write(const char *data, quint32 len){
+    if(ostrm->is_open()){
+        ostrm->write(data, len);
+        ostrm->flush();
+    }
+}
+
+
 QString util::WriteFile::getFilePath(){
     return filePath;
 }

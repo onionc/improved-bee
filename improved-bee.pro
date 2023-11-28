@@ -42,7 +42,8 @@ SOURCES += \
     luaScript/LuaScript.cpp \
     plot/plot.cpp \
     plot/qcustomplot.cpp \
-    plot/attitude.cpp
+    plot/attitude.cpp \
+    parsethread.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -58,7 +59,8 @@ HEADERS += \
     luaScript/LuaScript.h \
     plot/plot.h \
     plot/qcustomplot.h \
-    plot/attitude.h
+    plot/attitude.h \
+    parsethread.h
 
 FORMS += \
         mainwindow.ui \

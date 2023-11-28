@@ -142,7 +142,6 @@ MainWindow::MainWindow(QWidget *parent) :
     runTimer->setInterval(100);  //100ms
     connect(runTimer,&QTimer::timeout,this,&MainWindow::slot_taskScheduler);
 
-
     // 图像相关
     ui->led->setSize(15);
     ui->led->setColor(0); // 设定LED为灰色
@@ -167,6 +166,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(!title.isEmpty()){
         this->setWindowTitle(title);
     }
+
 
 }
 
@@ -1038,12 +1038,49 @@ void MainWindow::on_showAttitudeBtn_clicked()
     }
 
 }
-/*
+
 void MainWindow::on_parseDataBtn_clicked()
 {
+    // 1. 需要选择协议
+    if(!frameChecked){
+        QMessageBox::critical(this, "error", "请先确认数据协议");
+        return;
+    }
 
+
+    // 2. 解析时串口需要关闭
+    if(ui->openPortBtn->isChecked()){
+        QMessageBox::critical(this, "error", "请先关闭串口采集");
+        return;
+    }
+
+    // 3. 选择文件
+    QString dir = util::createDir("data");
+    QString filter = "数据文件(*.raw);;所有文件(*.*)";
+    QString loadFilename = QFileDialog::getOpenFileName(this, " 加载文件", dir, filter);
+    if(loadFilename.isEmpty()){
+        QMessageBox::warning(this, "打开失败", "文件名为空");
+        return;
+    }
+
+
+
+    // 失能按钮
+    ui->confirmFrameBtn->setEnabled(false);
+    ui->openPortBtn->setEnabled(false);
+
+    parseThread = new ParseThread(&parse, loadFilename, frameHz);
+
+    // 解析线程的通知
+    connect(parseThread, &ParseThread::updateProgress, this,&MainWindow::slot_parseProgress); // 进度条更新
+    connect(parseThread, &ParseThread::updateMsg, this, &MainWindow::slot_parseMsg); // 日志消息更新
+    connect(parseThread, &ParseThread::finished, this, [&](){
+        ui->confirmFrameBtn->setEnabled(true);
+        ui->openPortBtn->setEnabled(true);
+    });
+    parseThread->start();
 }
-*/
+
 
 void MainWindow::on_sendCommandBtn_clicked()
 {
@@ -1073,3 +1110,11 @@ void MainWindow::on_sendCommandBtn_clicked()
 
     return;
 }
+
+void MainWindow::slot_parseProgress(int i){
+    ui->parseProgressBar->setValue(i);
+}
+void MainWindow::slot_parseMsg(QString msg){
+    LogShow(msg);
+}
+

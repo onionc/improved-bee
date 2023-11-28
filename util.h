@@ -39,6 +39,7 @@ namespace util{
             // 写数据
             void write(QString s);
             void write(QByteArray arr);
+            void write(const char *data, quint32 len);
             // 返回文件名
             QString getFilePath();
     };
