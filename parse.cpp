@@ -135,6 +135,9 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                 case EnumClass::c_xor8_0:
                     frameCheckLen = 1;
                     break;
+                case EnumClass::c_add16:
+                    frameCheckLen = 2;
+                    break;
                 case EnumClass::c_crc16_xmodem:
                     frameCheckLen = 2;
                     break;
@@ -346,7 +349,7 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
     }
 
     quint8 result[4]={0x00}, r[4]={0x00};
-    unsigned short crcValue;
+    unsigned short crcValue=0, add16Value=0;
 
     switch(frameCheckSumType){
         case EnumClass::c_add8:
@@ -376,7 +379,7 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
                 result[0] = checkBytes.at(0); // 校验值
                 // 计算
                 r[0] = 0;
-                if(frameCheckSumType == EnumClass::c_add8_0){
+                if(frameCheckSumType == EnumClass::c_xor8_0){
                     // 计算帧头
                     for(int i=0; i<frameHeaderLen; i++){
                         result[0] ^= frameHeaderArr[i];
@@ -387,6 +390,29 @@ bool Parse::checkData(const QByteArray &checkDataBytes, const QByteArray &checkB
                     r[0]^=(quint8)checkDataBytes[i];
                 };
                 if(r[0] == result[0]){
+                    return true;
+                }
+            }
+            break;
+        case EnumClass::c_add16:
+            if(cSize==2){
+                if(util::smallEndian){
+                    // 小端，先收到的字节在前
+                    result[0] = checkBytes.at(0);
+                    result[1] = checkBytes.at(1);
+                }else{
+                    // 大端
+                    result[0] = checkBytes.at(1);
+                    result[1] = checkBytes.at(0);
+                }
+
+                for(int i=0; i<size; i++){
+                    add16Value+=(quint8)checkDataBytes[i];
+                };
+                r[0]=add16Value & 0x00FF;
+                r[1]=(add16Value & 0xFF00)>>8;
+
+                if(r[0]==result[0] && r[1]==result[1]){
                     return true;
                 }
             }
