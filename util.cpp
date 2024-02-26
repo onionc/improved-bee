@@ -205,6 +205,27 @@ qint32 util::bytes2int(quint8 arr[])
     }
     return b.d;
 }
+
+// 3字节转int，考虑最高位表示负数的情况
+qint32 util::bytes3_2int(quint8 arr[])
+{
+    static bytesInt b;
+    for(int i=0;i<3;i++){
+        if(smallEndian){
+            b.byte_arr[i] = arr[i];
+        }else{
+            b.byte_arr[2-i] = arr[i];
+        }
+    }
+
+    b.byte_arr[3] = 0;
+    if((b.byte_arr[2]&0x80) == 0x80){
+        b.byte_arr[3] = 0xff;
+    }
+
+    return b.d;
+}
+
 quint32 util::bytes2uint(quint8 arr[])
 {
     bytesUint b;

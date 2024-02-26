@@ -56,9 +56,8 @@ void Parse::loadFromIni(QString readFilename, QVector<SProperty> *data, bool &fr
             info.curve2 = read.value(QString("%1/curve2").arg(groupKey)).toBool();
             info.curve3 = read.value(QString("%1/curve3").arg(groupKey)).toBool();
             data->push_back(info);
-        }else if(groupKey=="endian"){
+        }else if(groupKey==INI_OTHER){
             frameLittleEndian = read.value(QString("%1/endian").arg(INI_OTHER)).toBool();
-        }else if(groupKey=="hz"){
             frameHz = read.value(QString("%1/hz").arg(INI_OTHER)).toUInt();
         }
     }
@@ -171,6 +170,10 @@ bool Parse::parseFrameInfo(const QVector<SProperty> *frameInfoData, QString &err
                 case EnumClass::t_ushort:
                     frameDataLen+=2;
                     nav.bytesLen = 2;
+                    break;
+                case EnumClass::t_3bytes:
+                    frameDataLen+=3;
+                    nav.bytesLen = 3;
                     break;
                 case EnumClass::t_int:
                     frameDataLen+=4;
@@ -510,6 +513,15 @@ bool Parse::parseFrameData(const QByteArray &frameBytesData){
                 nav->data.t_ushort = util::bytes2ushort(dp);
                 if(!nav->extFuncName.isEmpty()){
                     if(luaScirpt.runFunc(nav->extFuncName, nav->data.t_ushort, dp, 2, result)){
+                        nav->data.t_double = result;
+                    }
+                }
+                break;
+            case EnumClass::t_3bytes:
+                nav->data.t_3bytes = util::bytes3_2int(dp);;
+                if(!nav->extFuncName.isEmpty()){
+                    // 虽然数据t_3bytes是以int呈现的，但是如果方法内需要用到原数组，还是只有3字节
+                    if(luaScirpt.runFunc(nav->extFuncName, nav->data.t_3bytes, dp, 3, result)){
                         nav->data.t_double = result;
                     }
                 }

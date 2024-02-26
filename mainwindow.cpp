@@ -889,6 +889,19 @@ void MainWindow::slot_taskScheduler(){
                             tenSecData[j].data.t_ushort = info->data.t_ushort;
                         }
                         break;
+                    case EnumClass::t_3bytes:
+                        if(info->accumFlag){
+                            if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_3bytes;
+                            else oneSecData[j].data.t_double = info->data.t_3bytes;
+                            if(flag10sUpdate)  tenSecData[j].data.t_double += info->data.t_3bytes;
+                            else tenSecData[j].data.t_double = info->data.t_3bytes;
+
+                            if((dataCount+1)%(frameHz*10)==0) tenSecData[j].data.t_double/=10;
+                        }else{
+                            oneSecData[j].data.t_3bytes = info->data.t_3bytes;
+                            tenSecData[j].data.t_3bytes = info->data.t_3bytes;
+                        }
+                        break;
                     case EnumClass::t_int:
                         if(info->accumFlag){
                             if(flag1sUpdate)  oneSecData[j].data.t_double += info->data.t_int;

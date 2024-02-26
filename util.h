@@ -81,6 +81,8 @@ namespace util{
     qint16 bytes2short(quint8 arr[]);
     quint16 bytes2ushort(quint8 arr[]);
 
+
+    qint32 bytes3_2int(quint8 arr[]); // 3字节转int，最高位表示负数
     qint32 bytes2int(quint8 arr[]);
     quint32 bytes2uint(quint8 arr[]);
 

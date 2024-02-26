@@ -30,7 +30,7 @@ namespace DATA{
         Q_GADGET
     public:
         // 数据类型列表
-        enum typeListEnum{t_char=0, t_uchar, t_short, t_ushort, t_int, t_uint, t_float, t_double};
+        enum typeListEnum{t_char=0, t_uchar, t_short, t_ushort, t_3bytes, t_int, t_uint, t_float, t_double};
         Q_ENUM(typeListEnum)
 
 
@@ -46,6 +46,7 @@ namespace DATA{
         quint8 t_uchar;
         qint16 t_short;
         quint16 t_ushort;
+        qint32 t_3bytes;
         qint32 t_int;
         quint32 t_uint;
         float t_float;
@@ -113,6 +114,7 @@ namespace DATA{
                     case EnumClass::t_uchar: s = QString("%1").arg(data.t_uchar); break;
                     case EnumClass::t_short: s = QString("%1").arg(data.t_short); break;
                     case EnumClass::t_ushort: s = QString("%1").arg(data.t_ushort); break;
+                    case EnumClass::t_3bytes: s = QString("%1").arg(data.t_int); break;
                     case EnumClass::t_int: s = QString("%1").arg(data.t_int); break;
                     case EnumClass::t_uint: s = QString("%1").arg(data.t_uint); break;
                     case EnumClass::t_float: s = QString::number(data.t_float, 'f', 8); break;
